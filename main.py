@@ -1,9 +1,8 @@
 import random
 import asyncio
-import time
 from tkinter import *
 from PIL import Image, ImageTk
-
+# I'll merge this eventually
 root = Tk()
 ico = Image.open('dice.png')
 photo = ImageTk.PhotoImage(ico)

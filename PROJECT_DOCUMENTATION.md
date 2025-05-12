@@ -14,7 +14,7 @@
 
 ## Determining Specifications
 ### Functional Specifications
-* Lorem ipsum
+* 
 
 ### Non-Functional Specifications
 *Lorem ipsum
