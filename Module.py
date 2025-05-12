@@ -15,6 +15,7 @@ class Gamble:
       else:
           return "Failure"
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
   def Rng(collection, luck):
     items = [
         (1000000000, "MAINFRAME"),
@@ -29,6 +30,8 @@ class Gamble:
     collection["Item1"] = collection.get("Item1", 0) + 1
 
 =======
+=======
+>>>>>>> Stashed changes
   def Check_Success(collection,luck,chance,name):
       var1 = "Failure"
       count = 0
@@ -46,6 +49,9 @@ class Gamble:
              collection["Item1"] = 1
          else:
           collection["Item1"] += 1
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
   def placeholder_function(collection):
       print(collection)
