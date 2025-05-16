@@ -41,10 +41,14 @@
 *Crafting an item and selecting it after meeting requirements*
 ![Use Case 4](Use_4.png)
 ## Design
+*Storyboard*
+![Storyboard](Storyboard.png)
 *Level 0 DFD*
 ![Data Flow Diagram](DFD0.png)
 *Level 1 DFD*
 ![More Complex Data Flow Diagram](DFD1.png)
+*Gantt Chart*
+![Gantt Chart](Agile_Gantt.jpeg)
 ## Build and Test
 ```Python
 
