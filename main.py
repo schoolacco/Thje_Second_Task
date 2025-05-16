@@ -3,8 +3,8 @@ from tkinter import ttk
 from PIL import ImageTk, Image
 from Module import Gamble
 from pydub import AudioSegment
-from pydub.playback import play
-import pyperclip
+import simpleaudio as sa
+import threading
 collection = {}
 luck = 1
 root = Tk()
@@ -17,11 +17,6 @@ root.geometry("500x500+20+120")
 ico = Image.open('dice.png')
 photo = ImageTk.PhotoImage(ico)
 root.wm_iconphoto(False, photo)
-try:
-  song = AudioSegment.from_mp3("Fallen_Symphony.mp3")
-  play(song)
-except Exception as e:
-  pyperclip.copy(e)
 Nb = ttk.Notebook(root, cursor="circle")
 s = ttk.Style()
 s.configure('TFrame', background="black") #Change Style() to create bgs for frames
@@ -44,4 +39,20 @@ Button(collection_frame, text="Refresh List", bg="black", fg="white", command=la
 collection_frame.pack()
 Nb.add(collection_frame, text='Collection')
 Nb.pack(fill=BOTH, expand=TRUE)
+
+song = AudioSegment.from_wav("Fallen_Symphony.wav")
+
+def play_music():
+    # Export to raw data
+    playback = sa.play_buffer(
+        song.raw_data,
+        num_channels=song.channels,
+        bytes_per_sample=song.sample_width,
+        sample_rate=song.frame_rate
+    )
+    playback.wait_done()  # optional — blocks the thread only, not GUI
+
+# Run in a thread
+threading.Thread(target=play_music, daemon=True).start()
+
 root.mainloop()
