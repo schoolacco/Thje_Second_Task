@@ -16,6 +16,10 @@ def load_collection():
       collection.clear() # Empty dictionary
       collection.update(data) # Fill dictionary with json data
       Refresh() # Update collection tab
+def Hide():
+   global admin
+   admin = False
+   Nb.forget(admin_frame)
 def ADMIN():
    '''This function simply checks the username and password from the ??? tab, and if correct adds the admin tab'''
    global admin
@@ -94,7 +98,7 @@ def Luck():
       pass
 Button(admin_frame, text="Set Luck", bg="black", fg="white", command=lambda:Luck()).pack() # Set the luck
 Button(admin_frame, text="Auto Roll", bg="black", fg="white", command=lambda: auto_roll_stat()).pack() # Change the status of the auto roll
-Button(admin_frame, text="Hide The Evidence", bg="black", fg="white", command=lambda:Nb.forget(admin_frame)).pack() # What ADMIN frame? You're imagining things
+Button(admin_frame, text="Hide The Evidence", bg="black", fg="white", command=lambda: Hide()).pack() # What ADMIN frame? You're imagining things
 '''----------Music----------'''
 song = AudioSegment.from_wav("Clair_de_Lune.wav") # Background music
 
