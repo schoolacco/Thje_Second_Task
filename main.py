@@ -1,58 +1,131 @@
-from tkinter import *
-from tkinter import ttk
-from PIL import ImageTk, Image
-from Module import Gamble
-from pydub import AudioSegment
-import simpleaudio as sa
-import threading
+from tkinter import * # For the GUIs as always
+from tkinter import ttk # Specifically for the notebook tabs
+from PIL import ImageTk, Image # Just so I can change the window icon
+from Module import Gamble, Gear, SaveLoad # My module
+from pydub import AudioSegment # Convert the music into useful data
+import simpleaudio as sa # Play the music
+import threading # Asynchio but simple, essentially runs programs within the program
+import time # Force stops the program for a period of time, compatible with threads
+# This program is a little complex
+'''----------Initialisation----------'''
+admin = False # This just sets the global variables
+def load_collection():
+   '''This accesses your save file using the load function, and updates your collection to reflect it'''
+   data = SaveLoad.Load()
+   if data: # If the data exists
+      collection.clear() # Empty dictionary
+      collection.update(data) # Fill dictionary with json data
+      Refresh() # Update collection tab
+def ADMIN():
+   '''This function simply checks the username and password from the ??? tab, and if correct adds the admin tab'''
+   global admin
+   Pass = password_entry.get() # Get password
+   User = user_entry.get() # Get username
+   if Pass == '*? DATA = NULL !"' and User == "ADMIN" and not admin: # not admin is to prevent duplication
+      admin_frame.pack()
+      Nb.add(admin_frame, text="ADMIN")
+      admin = True
+auto_roll_var = threading.Event() # Set this to an event
 collection = {}
 luck = 1
-root = Tk()
+root = Tk() # Basic set up stuff
 root.title("TooRNG")
 root.configure(bg="black")
 root.config(width=1000,height=1000)
 root.minsize(100,100)
 root.maxsize(5000,5000)
 root.geometry("500x500+20+120")
-ico = Image.open('dice.png')
+ico = Image.open('dice.png') # Change iconphoto
 photo = ImageTk.PhotoImage(ico)
-root.wm_iconphoto(False, photo)
-Nb = ttk.Notebook(root, cursor="circle")
+root.wm_iconphoto(False, photo) 
+Nb = ttk.Notebook(root, cursor="circle") # Insert notebook and change cursor
 s = ttk.Style()
 s.configure('TFrame', background="black") #Change Style() to create bgs for frames
+'''----------RNG----------'''
 rng_frame = ttk.Frame(Nb, width=2000, height=2000, style='TFrame') #Create a tab in the notebook
 Label(rng_frame, text="There is nothing much to say, click the button to begin.", bg="black", fg="white", anchor="center").pack()
-roll = Button(rng_frame, text="Roll", command=lambda: Gamble.Rng(collection, luck), bg="black", fg="white")
+roll = Button(rng_frame, text="Roll", command=lambda: Gamble.Rng(collection, luck, root), bg="black", fg="white") # Create a button which runs the rng command
 roll.pack()
-Button(rng_frame, text="View collection", command=lambda: Gamble.placeholder_function(collection), bg="black", fg="white").pack()
 rng_frame.pack()
 Nb.add(rng_frame, text="RNG")
+'''----------Collection----------'''
 collection_frame = ttk.Frame(Nb,width=2000, height=2000, style='TFrame')
-List = Listbox(collection_frame, listvariable=collection, selectmode=SINGLE)
+List = Listbox(collection_frame, listvariable=collection, selectmode=SINGLE) # Initiates the listbox, kinda useless
 List.pack()
 def Refresh():
-  global List, collection
-  List.destroy()
-  List = Listbox(master=collection_frame, listvariable=collection, selectmode=SINGLE) #Destroy the list to update it
-  List.pack()
+  '''Updates the listbox, doesn't destroy it this time, how nice, also really confusing list syntax that I stole online and somehow managed to understand and edit'''
+  listvar = Variable(value=[f"{k}: {v}" for k,v in collection.items()]) #Create a list with the display of: item name: amount, use variable to turn it into something the Listbox is compatible with.
+  List.configure(listvariable=listvar) # A bit nicer then destroying it right?
 Button(collection_frame, text="Refresh List", bg="black", fg="white", command=lambda: Refresh()).pack()
 collection_frame.pack()
 Nb.add(collection_frame, text='Collection')
-Nb.pack(fill=BOTH, expand=TRUE)
+'''----------Crafting----------'''
+gear_frame = ttk.Frame(Nb, width=2000, height=2000, style='TFrame')
+Gear1 = Gear(name="Gear1", requirements={"Item1": 100, "Item3": 10}, luck_boost=2, speed_boost=0.1) # Create a gear
+Button(gear_frame, text="Equip Gear1", bg="black", fg="white", command=lambda: Gear.equip(Gear1, luck, collection)).pack() # Unequiping will be inserted in future
+gear_frame.pack()
+Nb.add(gear_frame, text="Crafting")
 
-song = AudioSegment.from_wav("Fallen_Symphony.wav")
+'''----------Save/Load----------'''
+save_frame = ttk.Frame(Nb, width=2000, height=2000, style='TFrame')
+Button(save_frame, text="Save", bg="black", fg="white", command=lambda: SaveLoad.Save(collection)).pack() # Create a button to save your data 
+Button(save_frame, text="Load", bg="black", fg="white", command=lambda: load_collection()).pack() # Create a button to load your data
+save_frame.pack()
+Nb.add(save_frame, text="Save/Load")
+'''----------Admin----------'''
+unknown_frame = ttk.Frame(Nb, width=2000, height=2000, style='TFrame')
+user_entry = Entry(unknown_frame)
+user_entry.pack()
+password_entry = Entry(unknown_frame, show="*") # Censorship
+password_entry.pack()
+Button(unknown_frame, text="???", bg="black", fg="white", command=lambda: ADMIN()).pack() # ???
+unknown_frame.pack()
+Nb.add(unknown_frame, text="???")
+admin_frame = ttk.Frame(Nb, width=2000, height=2000, style='TFrame')
+Label(admin_frame, text="Luck", bg="black", fg="white").pack()
+Luck_entry = Entry(admin_frame)
+Luck_entry.pack()
+def Luck():
+   '''Set luck to a value for debugging or cheating'''
+   global luck
+   try:
+      luck = float(Luck_entry.get())
+   except ValueError:
+      pass
+Button(admin_frame, text="Set Luck", bg="black", fg="white", command=lambda:Luck()).pack() # Set the luck
+Button(admin_frame, text="Auto Roll", bg="black", fg="white", command=lambda: auto_roll_stat()).pack() # Change the status of the auto roll
+Button(admin_frame, text="Hide The Evidence", bg="black", fg="white", command=lambda:Nb.forget(admin_frame)).pack() # What ADMIN frame? You're imagining things
+'''----------Music----------'''
+song = AudioSegment.from_wav("Clair_de_Lune.wav") # Background music
 
 def play_music():
+    '''This constantly loops background music'''
     # Export to raw data
-    playback = sa.play_buffer(
-        song.raw_data,
-        num_channels=song.channels,
-        bytes_per_sample=song.sample_width,
-        sample_rate=song.frame_rate
-    )
-    playback.wait_done()  # optional — blocks the thread only, not GUI
+    while True:
+      playback = sa.play_buffer( #I'm not going to act like I understand what these are used for
+          song.raw_data,
+          num_channels=song.channels,
+          bytes_per_sample=song.sample_width,
+          sample_rate=song.frame_rate
+      )
+      playback.wait_done() # This waits until the song is finished before continuing
 
 # Run in a thread
-threading.Thread(target=play_music, daemon=True).start()
+threading.Thread(target=play_music, daemon=True).start() # Asynchio but not complicated, begins running the play_music function seperately to not freeze the GUI
 
-root.mainloop()
+def auto_roll(collection, luck):
+    '''Simple code for a future feature, automatically runs the roll function in the background'''
+    while auto_roll_var.is_set():
+       Gamble.Rng(collection,luck, root)
+       time.sleep(0.1) # The time will become a variable in future
+def auto_roll_stat():
+  if auto_roll_var.is_set(): # If the auto roll is on
+     auto_roll_var.clear() # Disable it
+  else:
+    auto_roll_var.set()
+    threading.Thread(target= lambda: auto_roll(collection, luck), daemon=True).start() # Start autorolling with freezing the GUI
+# auto_roll_var.set() to enable, auto_roll_var.clear() to disable
+'''----------Running the program----------'''
+Nb.pack(fill=BOTH, expand=TRUE) # The options make sure it fills the whole window
+if __name__ == "__main__": # I have no idea what this does, but people do it
+  root.mainloop()
