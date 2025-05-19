@@ -36,3 +36,19 @@ Extract it to:
 <br>
 Now open this:<br>
 ![Guide Image](System.png)
+<br>
+Click on this button:<br>
+![Guide Image](Environment.png)
+<br>
+Click on Path:
+![Guide Image](Path.png)
+<br>
+Click on edit and then new and enter in C:\ffmpeg\bin
+If you have done everything correctly you will have installed ffmpeg
+
+### Microsoft C++
+
+First go to the above link and download the set up, agree to the terms and it will download vs, now click on the C++ build tools, the nessecary downloads are checkmarked automatically, download it and you can now use:
+```bash
+pip install simpleaudio
+```
