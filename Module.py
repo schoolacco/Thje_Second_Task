@@ -80,10 +80,10 @@ class Biome(Gamble):
     collection["Item1"] = collection.get("Item1", 0) + 1
    def insert(current_biome, biome, collection, luck, chance, name, GUI):
       '''Just simplification to avoid clutter, simply adds to the collection, now also runs the cutscene'''
-      if random.randint(0,round(chance/luck)) == 0:
+      if random.randint(0,round(chance/luck)) == 0 and current_biome == biome:
           if name == "MAINFRAME":
              GUI.after(0, lambda: Gamble.Cutscene(colours=["#E5CC99", "#E59796", "#FFFFFF", "#BBE6A8", "#BF80E5","#ABD6EB"], texts=["MAINFRAME", "POWER", "OVERWHELMING", "CORRUPTION", "UNSTABLE", "ERROR", "FAILURE"], GUI=GUI, wav="Why.wav")) # This may look complicated, but it just defines some variables for the function, notably lists of what to flash through
-          if name not in collection and current_biome == biome:
+          if name not in collection:
               collection[name] = 1
               return "Success"
           else:
@@ -99,10 +99,17 @@ class Biome(Gamble):
             (500, "MAINFRAME"),
         ]
         for chance, name in biomes:
-           pass
+           result = Biome.biome_roll(name, chance)
+           if "Success" in result:
+              current_biome = result[1]
+              return
         # If no success after all attempts
         current_biome = "Normal"
         return current_biome
+   def biome_roll(name, chance):
+      if random.randint(0,chance) == 0:
+         return ["Success", name]
+
 
 class Gear:
     def __init__(self, requirements, name, luck_boost):
