@@ -63,21 +63,20 @@ class Gamble:
          cutscene.destroy() # After finishing destroy the GUI
      effect(step) # Begin the effect
 class Gear:
-    def __init__(self, requirements, name, luck_boost, speed_boost):
+    def __init__(self, requirements, name, luck_boost):
         '''Initialise information about the gear'''
         if isinstance(requirements, list):
             dict(requirements)
         self.requirements = requirements
         self.name = name
         self.luck_boost = int(luck_boost)
-        self.speed_boost = speed_boost
-    def check_requirements(gear, collection):
+    def check_requirements(self, collection):
           '''A function to check if you meet every requirement'''
-          return  all(collection.get(k,0) >= v for k,v in gear.requirements.items()) # All only returns true if everything value is satisfied, collections.get(k,0) essentially tries to find the key and retrieve the value else it will default to 0, the rest is simple, checking if the value is greater than or equal to that of the pre-defined requirements
-    def equip(gear, luck, collection):
+          return  all(collection.get(k,0) >= v for k,v in self.requirements.items()) # All only returns true if everything value is satisfied, collections.get(k,0) essentially tries to find the key and retrieve the value else it will default to 0, the rest is simple, checking if the value is greater than or equal to that of the pre-defined requirements
+    def equip(self, luck, collection):
      '''Simple code that increases luck based on the gear luck boost, speed boost will be added in future'''
-     if Gear.check_requirements(gear, collection):
-       luck = luck * gear.luck_boost # Change value of luck
+     if Gear.check_requirements(self, collection):
+       luck = luck * self.luck_boost # Change value of luck
        return luck
      else:
          print("Requirements not met")

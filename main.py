@@ -65,7 +65,7 @@ collection_frame.pack()
 Nb.add(collection_frame, text='Collection')
 '''----------Crafting----------'''
 gear_frame = ttk.Frame(Nb, width=2000, height=2000, style='TFrame')
-Gear1 = Gear(name="Gear1", requirements={"Item1": 100, "Item3": 10}, luck_boost=2, speed_boost=0.1) # Create a gear
+Gear1 = Gear(name="Gear1", requirements={"Item1": 100, "Item3": 10}, luck_boost=2) # Create a gear
 Button(gear_frame, text="Equip Gear1", bg="black", fg="white", command=lambda: Gear.equip(Gear1, luck, collection)).pack() # Unequiping will be inserted in future
 gear_frame.pack()
 Nb.add(gear_frame, text="Crafting")

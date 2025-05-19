@@ -56,6 +56,11 @@
 
 ## Review
 
+1. The system is entirely successful in meeting all specified functional and non-functional requirements and also meets many further unnessecary requirements (that realistically should've been implemented in future sprints), it is capable of saving and loading data via json, accessing the collection and allowing the user to view it, it is capable of "crafting" upon meeting requirements, there is currently little to no delay in the functionality of anything and the system encounter no runtime errors with it being relatively easy to naviagate.
+2. The system handles inputs and outputs almost exactly as planned, although one use case has yet to have been made (planned for next sprint) all other use cases have been recreated in a similar fashion to what was originally planned for the system.
+3. The functions, variables and docstrings/comments ensure that the code is easily readable and understandable with everything being rather clear if you have a fundemental level of understanding of the modules already being used. The system as a whole is very organised with designated sections seperated by strings to increase clarity.
+4. The next sprint is intended to include the main feature of the game among various other smaller features for the game to have, including an auto-roll for normal players, for gears and a way to increase rolling speed, a roll cooldown, biomes and many other minor features to increase the complexity of the game.
+
 # Sprint 2
 
 ## Design

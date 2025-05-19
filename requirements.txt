@@ -1,0 +1,4 @@
+simpleaudio==1.0.4
+pydub==0.25.1
+pillow==11.1.0
+ffmpeg==1.4
