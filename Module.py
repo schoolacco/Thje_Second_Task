@@ -5,6 +5,7 @@ from tkinter import *
 from pydub import AudioSegment
 import threading
 import simpleaudio as sa
+import time
 # It's about as bad as the main program
 class Gamble:
   def __init__(self, chance, name):
@@ -62,6 +63,47 @@ class Gamble:
        else:
          cutscene.destroy() # After finishing destroy the GUI
      effect(step) # Begin the effect
+class Biome(Gamble):
+   def __init__(self, chance, name, biome):
+      super().__init__(chance, name)
+      self.biome = biome
+   def Rng(collection, luck, chance, name, biome, GUI, current_biome):
+    '''The actual rolling function, refer mostly loops the rolling and handles the scenario for if you get nothing, this version includes biome-exclusives and biome luck-boosts'''
+    items = [
+        (1000000, "MAINFRAME", "MAINFRAME"),
+    ]
+    for chance, name, biome in items:
+        result = Biome.insert(current_biome, biome, collection, luck, chance, name, GUI)
+        if result == "Success":
+            return  # Stop rolling on success
+    # If no success after all attempts
+    collection["Item1"] = collection.get("Item1", 0) + 1
+   def insert(current_biome, biome, collection, luck, chance, name, GUI):
+      '''Just simplification to avoid clutter, simply adds to the collection, now also runs the cutscene'''
+      if random.randint(0,round(chance/luck)) == 0:
+          if name == "MAINFRAME":
+             GUI.after(0, lambda: Gamble.Cutscene(colours=["#E5CC99", "#E59796", "#FFFFFF", "#BBE6A8", "#BF80E5","#ABD6EB"], texts=["MAINFRAME", "POWER", "OVERWHELMING", "CORRUPTION", "UNSTABLE", "ERROR", "FAILURE"], GUI=GUI, wav="Why.wav")) # This may look complicated, but it just defines some variables for the function, notably lists of what to flash through
+          if name not in collection and current_biome == biome:
+              collection[name] = 1
+              return "Success"
+          else:
+              collection[name] += 1
+              return "Success"
+      else:
+          return "Failure"
+   def biome_change(current_biome):
+      '''Changes the biome'''
+      while True:
+        time.sleep(600)
+        biomes = [
+            (500, "MAINFRAME"),
+        ]
+        for chance, name in biomes:
+           pass
+        # If no success after all attempts
+        current_biome = "Normal"
+        return current_biome
+
 class Gear:
     def __init__(self, requirements, name, luck_boost):
         '''Initialise information about the gear'''
