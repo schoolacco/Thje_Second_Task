@@ -101,8 +101,7 @@ class Biome(Gamble):
         for chance, name in biomes:
            result = Biome.biome_roll(name, chance)
            if "Success" in result:
-              current_biome = result[1]
-              return
+              return result[1]
         # If no success after all attempts
         current_biome = "Normal"
         return current_biome
