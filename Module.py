@@ -74,7 +74,7 @@ class Biome(Gamble):
     for chance, name, biome in items:
         result = Biome.insert(current_biome, biome, collection, luck, chance, name, GUI)
         if result == "Success":
-            return  # Stop rolling on success
+            return  "Success" # Stop rolling on success
    def insert(current_biome, biome, collection, luck, chance, name, GUI):
       '''Just simplification to avoid clutter, simply adds to the collection, now also runs the cutscene'''
       if random.randint(0,round(chance/luck)) == 0 and current_biome in biome:

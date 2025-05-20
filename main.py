@@ -113,7 +113,7 @@ def play_music():
     # Export to raw data
     while True:
       try:
-        song = AudioSegment.from_wav(biome_song[current_biome]) # Background music
+        song = AudioSegment.from_wav(biome_song.get(current_biome, "Clair_de_Lune.wav")) # Background music
       except KeyError:
          song = AudioSegment.from_wav("Clair_de_Lune.wav")
       playback = sa.play_buffer( #I'm not going to act like I understand what these are used for
@@ -132,9 +132,7 @@ threading.Thread(target=play_music, daemon=True).start() # Asynchio but not comp
 def auto_roll(collection, luck):
     '''Simple code for a future feature, automatically runs the roll function in the background'''
     while auto_roll_var.is_set():
-       Gamble.Rng(collection,luck, root)
-       Biome.Rng(collection, luck, root, current_biome)
-       Refresh()
+       Roll(collection, luck, root, current_biome)
        time.sleep(0.1) # The time will become a variable in future
 def auto_roll_stat():
   if auto_roll_var.is_set(): # If the auto roll is on
@@ -153,8 +151,9 @@ def biome_change(Label):
      sa.stop_all()
 def Roll(collection, luck, GUI, current_biome):
    '''Just triggers both RNG functions to roll'''
-   Gamble.Rng(collection, luck, GUI)
-   Biome.Rng(collection, luck, GUI, current_biome)
+   stat = Biome.Rng(collection, luck, GUI, current_biome)
+   if stat != "Success":
+     Gamble.Rng(collection, luck, GUI)
    Refresh()
 def set_biome(Label, Entry):
    '''Debug method to set the biome'''
