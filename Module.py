@@ -69,7 +69,7 @@ class Biome(Gamble):
    def Rng(collection, luck, GUI, current_biome):
     '''The actual rolling function, refer mostly loops the rolling and handles the scenario for if you get nothing, this version includes biome-exclusives and biome luck-boosts'''
     items = [
-        (1000000, "MAINFRAME", "MAINFRAME"), (100, "ItemE", "MAINFRAME")
+        (1000000, "MAINFRAME", "MAINFRAME"), (100, "ItemE", "MAINFRAME"), (1000, "MAINFRAME", "MAINFRAME//FALLEN"), (2, "ItemE", "MAINFRAME//FALLEN")
     ]
     for chance, name, biome in items:
         result = Biome.insert(current_biome, biome, collection, luck, chance, name, GUI)
@@ -93,19 +93,20 @@ class Biome(Gamble):
    def biome_change():
       '''Changes the biome'''
       biomes = [
-          (500, "MAINFRAME"),
+          (500, "MAINFRAME"), (100, "Paradiso"), (100, "HIS Domain"), (5000, "MAINFRAME//FALLEN")
       ]
       for chance, name in biomes:
          result = Biome.biome_roll(name, chance)
          if "Success" in result:
             return result[1]
       # If no success after all attempts
-      current_biome = "Normal"
-      return current_biome
+      return "Normal"
    def biome_roll(name, chance):
       '''A simplified version of the "insert" function for specifically the biome'''
       if random.randint(0,chance) == 0:
          return ["Success", name]
+      else:
+         return "Failure"
 
 
 class Gear:

@@ -8,6 +8,7 @@ import threading # Asynchio but simple, essentially runs programs within the pro
 import time # Force stops the program for a period of time, compatible with threads
 # This program is a little complex
 '''----------Initialisation----------'''
+biome_song = {"Normal": "Clair_de_Lune.wav", "MAINFRAME//FALLEN": "Fallen_Symphony.wav"}
 admin = False # This just sets the global variables
 current_biome = "Normal"
 def load_collection():
@@ -107,12 +108,12 @@ Button(admin_frame, text="Set Biome", bg="black", fg="white", command= lambda: s
 Button(admin_frame, text="Auto Roll", bg="black", fg="white", command=lambda: auto_roll_stat()).pack() # Change the status of the auto roll
 Button(admin_frame, text="Hide The Evidence", bg="black", fg="white", command=lambda: Hide()).pack() # What ADMIN frame? You're imagining things
 '''----------Music----------'''
-song = AudioSegment.from_wav("Clair_de_Lune.wav") # Background music
 
 def play_music():
     '''This constantly loops background music'''
     # Export to raw data
     while True:
+      song = AudioSegment.from_wav(biome_song[current_biome]) # Background music
       playback = sa.play_buffer( #I'm not going to act like I understand what these are used for
           song.raw_data,
           num_channels=song.channels,
@@ -141,11 +142,12 @@ def auto_roll_stat():
 # auto_roll_var.set() to enable, auto_roll_var.clear() to disable
 def biome_change(Label):
    '''Changes the biome, who would've guessed?'''
+   global current_biome
    while True:
      time.sleep(600)
      current_biome = Biome.biome_change() # Run the function to change the biome, and set the current biome to it.
      Label.configure(text=f"Biome: {current_biome}") # Sets a label so the user can see
-threading.Thread(target= lambda: biome_change(biome_stat)) # Constantly runs the biome changing functions (maybe)
+     sa.stop_all()
 def Roll(collection, luck, GUI, current_biome):
    '''Just triggers both RNG functions to roll'''
    Gamble.Rng(collection, luck, GUI)
@@ -155,6 +157,9 @@ def set_biome(Label, Entry):
    global current_biome
    current_biome = Entry.get()
    Label.configure(text=f"Biome {current_biome}")
+   sa.stop_all()
+threading.Thread(target=lambda: biome_change(biome_stat), daemon=True).start() # Constantly runs the biome changing functions (maybe)
+
 '''----------Running the program----------'''
 Nb.pack(fill=BOTH, expand=TRUE) # The options make sure it fills the whole window
 if __name__ == "__main__": # I have no idea what this does, but people do it
