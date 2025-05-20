@@ -5,7 +5,6 @@ from tkinter import *
 from pydub import AudioSegment
 import threading
 import simpleaudio as sa
-import time
 # It's about as bad as the main program
 class Gamble:
   def __init__(self, chance, name):
@@ -93,18 +92,16 @@ class Biome(Gamble):
           return "Failure"
    def biome_change():
       '''Changes the biome'''
-      while True:
-        time.sleep(600)
-        biomes = [
-            (500, "MAINFRAME"),
-        ]
-        for chance, name in biomes:
-           result = Biome.biome_roll(name, chance)
-           if "Success" in result:
-              return result[1]
-        # If no success after all attempts
-        current_biome = "Normal"
-        return current_biome
+      biomes = [
+          (500, "MAINFRAME"),
+      ]
+      for chance, name in biomes:
+         result = Biome.biome_roll(name, chance)
+         if "Success" in result:
+            return result[1]
+      # If no success after all attempts
+      current_biome = "Normal"
+      return current_biome
    def biome_roll(name, chance):
       '''A simplified version of the "insert" function for specifically the biome'''
       if random.randint(0,chance) == 0:

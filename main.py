@@ -141,8 +141,10 @@ def auto_roll_stat():
 # auto_roll_var.set() to enable, auto_roll_var.clear() to disable
 def biome_change(Label):
    '''Changes the biome, who would've guessed?'''
-   current_biome = Biome.biome_change() # Run the function to change the biome, and set the current biome to it.
-   Label.configure(text=f"Biome: {current_biome}") # Sets a label so the user can see
+   while True:
+     time.sleep(600)
+     current_biome = Biome.biome_change() # Run the function to change the biome, and set the current biome to it.
+     Label.configure(text=f"Biome: {current_biome}") # Sets a label so the user can see
 threading.Thread(target= lambda: biome_change(biome_stat)) # Constantly runs the biome changing functions (maybe)
 def Roll(collection, luck, GUI, current_biome):
    '''Just triggers both RNG functions to roll'''
