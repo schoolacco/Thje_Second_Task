@@ -91,7 +91,7 @@ class Biome(Gamble):
               return "Success"
       else:
           return "Failure"
-   def biome_change(current_biome):
+   def biome_change():
       '''Changes the biome'''
       while True:
         time.sleep(600)

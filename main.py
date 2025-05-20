@@ -124,6 +124,8 @@ def play_music():
 # Run in a thread
 threading.Thread(target=play_music, daemon=True).start() # Asynchio but not complicated, begins running the play_music function seperately to not freeze the GUI
 
+'''----------Rolling----------'''
+
 def auto_roll(collection, luck):
     '''Simple code for a future feature, automatically runs the roll function in the background'''
     while auto_roll_var.is_set():
@@ -138,13 +140,16 @@ def auto_roll_stat():
     threading.Thread(target= lambda: auto_roll(collection, luck), daemon=True).start() # Start autorolling with freezing the GUI
 # auto_roll_var.set() to enable, auto_roll_var.clear() to disable
 def biome_change(Label):
-   current_biome = Biome.biome_change(current_biome)
-   Label.configure(text=f"Biome: {current_biome}")
-threading.Thread(target= lambda: biome_change(biome_stat))
+   '''Changes the biome, who would've guessed?'''
+   current_biome = Biome.biome_change() # Run the function to change the biome, and set the current biome to it.
+   Label.configure(text=f"Biome: {current_biome}") # Sets a label so the user can see
+threading.Thread(target= lambda: biome_change(biome_stat)) # Constantly runs the biome changing functions (maybe)
 def Roll(collection, luck, GUI, current_biome):
+   '''Just triggers both RNG functions to roll'''
    Gamble.Rng(collection, luck, GUI)
    Biome.Rng(collection, luck, GUI, current_biome)
 def set_biome(Label, Entry):
+   '''Debug method to set the biome'''
    global current_biome
    current_biome = Entry.get()
    Label.configure(text=f"Biome {current_biome}")
