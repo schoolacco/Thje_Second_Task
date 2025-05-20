@@ -67,10 +67,10 @@ class Biome(Gamble):
    def __init__(self, chance, name, biome):
       super().__init__(chance, name)
       self.biome = biome
-   def Rng(collection, luck, chance, name, biome, GUI, current_biome):
+   def Rng(collection, luck, GUI, current_biome):
     '''The actual rolling function, refer mostly loops the rolling and handles the scenario for if you get nothing, this version includes biome-exclusives and biome luck-boosts'''
     items = [
-        (1000000, "MAINFRAME", "MAINFRAME"),
+        (1000000, "MAINFRAME", "MAINFRAME"), (100, "ItemE", "MAINFRAME")
     ]
     for chance, name, biome in items:
         result = Biome.insert(current_biome, biome, collection, luck, chance, name, GUI)
@@ -106,6 +106,7 @@ class Biome(Gamble):
         current_biome = "Normal"
         return current_biome
    def biome_roll(name, chance):
+      '''A simplified version of the "insert" function for specifically the biome'''
       if random.randint(0,chance) == 0:
          return ["Success", name]
 

@@ -1,7 +1,7 @@
 from tkinter import * # For the GUIs as always
 from tkinter import ttk # Specifically for the notebook tabs
 from PIL import ImageTk, Image # Just so I can change the window icon
-from Module import Gamble, Gear, SaveLoad # My module
+from Module import Gamble, Gear, SaveLoad, Biome # My module
 from pydub import AudioSegment # Convert the music into useful data
 import simpleaudio as sa # Play the music
 import threading # Asynchio but simple, essentially runs programs within the program
@@ -9,6 +9,7 @@ import time # Force stops the program for a period of time, compatible with thre
 # This program is a little complex
 '''----------Initialisation----------'''
 admin = False # This just sets the global variables
+current_biome = "Normal"
 def load_collection():
    '''This accesses your save file using the load function, and updates your collection to reflect it'''
    data = SaveLoad.Load()
@@ -48,8 +49,10 @@ s.configure('TFrame', background="black") #Change Style() to create bgs for fram
 '''----------RNG----------'''
 rng_frame = ttk.Frame(Nb, width=2000, height=2000, style='TFrame') #Create a tab in the notebook
 Label(rng_frame, text="There is nothing much to say, click the button to begin.", bg="black", fg="white", anchor="center").pack()
-roll = Button(rng_frame, text="Roll", command=lambda: Gamble.Rng(collection, luck, root), bg="black", fg="white") # Create a button which runs the rng command
+roll = Button(rng_frame, text="Roll", command=lambda: Roll(collection, luck, root, current_biome), bg="black", fg="white") # Create a button which runs the rng command
 roll.pack()
+biome_stat = Label(rng_frame, text="Biome: Normal", bg="black", fg="white")
+biome_stat.pack()
 rng_frame.pack()
 Nb.add(rng_frame, text="RNG")
 '''----------Collection----------'''
@@ -97,6 +100,10 @@ def Luck():
    except ValueError:
       pass
 Button(admin_frame, text="Set Luck", bg="black", fg="white", command=lambda:Luck()).pack() # Set the luck
+Label(admin_frame, text="Set Biome", bg="black", fg="white").pack()
+Biome_entry = Entry(admin_frame)
+Biome_entry.pack()
+Button(admin_frame, text="Set Biome", bg="black", fg="white", command= lambda: set_biome(biome_stat, Biome_entry)).pack()
 Button(admin_frame, text="Auto Roll", bg="black", fg="white", command=lambda: auto_roll_stat()).pack() # Change the status of the auto roll
 Button(admin_frame, text="Hide The Evidence", bg="black", fg="white", command=lambda: Hide()).pack() # What ADMIN frame? You're imagining things
 '''----------Music----------'''
@@ -121,6 +128,7 @@ def auto_roll(collection, luck):
     '''Simple code for a future feature, automatically runs the roll function in the background'''
     while auto_roll_var.is_set():
        Gamble.Rng(collection,luck, root)
+       Biome.Rng(collection, luck, root, current_biome)
        time.sleep(0.1) # The time will become a variable in future
 def auto_roll_stat():
   if auto_roll_var.is_set(): # If the auto roll is on
@@ -129,6 +137,17 @@ def auto_roll_stat():
     auto_roll_var.set()
     threading.Thread(target= lambda: auto_roll(collection, luck), daemon=True).start() # Start autorolling with freezing the GUI
 # auto_roll_var.set() to enable, auto_roll_var.clear() to disable
+def biome_change(Label):
+   current_biome = Biome.biome_change(current_biome)
+   Label.configure(text=f"Biome: {current_biome}")
+threading.Thread(target= lambda: biome_change(biome_stat))
+def Roll(collection, luck, GUI, current_biome):
+   Gamble.Rng(collection, luck, GUI)
+   Biome.Rng(collection, luck, GUI, current_biome)
+def set_biome(Label, Entry):
+   global current_biome
+   current_biome = Entry.get()
+   Label.configure(text=f"Biome {current_biome}")
 '''----------Running the program----------'''
 Nb.pack(fill=BOTH, expand=TRUE) # The options make sure it fills the whole window
 if __name__ == "__main__": # I have no idea what this does, but people do it
