@@ -8,7 +8,7 @@ import threading # Asynchio but simple, essentially runs programs within the pro
 import time # Force stops the program for a period of time, compatible with threads
 # This program is a little complex
 '''----------Initialisation----------'''
-biome_song = {"Normal": "Clair_de_Lune.wav", "MAINFRAME//FALLEN": "Fallen_Symphony.wav"}
+biome_song = {"Normal": "Clair_de_Lune.wav", "Paradiso": "Ascension_to_Heaven.wav", "HIS Domain": "In_the_House,_in_a_Heartbeat.wav", "MAINFRAME": "Your_Friend_Equals_false.wav", "MAINFRAME//FALLEN": "Fallen_Symphony.wav"}
 admin = False # This just sets the global variables
 current_biome = "Normal"
 def load_collection():
@@ -64,7 +64,6 @@ def Refresh():
   '''Updates the listbox, doesn't destroy it this time, how nice, also really confusing list syntax that I stole online and somehow managed to understand and edit'''
   listvar = Variable(value=[f"{k}: {v}" for k,v in collection.items()]) #Create a list with the display of: item name: amount, use variable to turn it into something the Listbox is compatible with.
   List.configure(listvariable=listvar) # A bit nicer then destroying it right?
-Button(collection_frame, text="Refresh List", bg="black", fg="white", command=lambda: Refresh()).pack()
 collection_frame.pack()
 Nb.add(collection_frame, text='Collection')
 '''----------Crafting----------'''
@@ -113,7 +112,10 @@ def play_music():
     '''This constantly loops background music'''
     # Export to raw data
     while True:
-      song = AudioSegment.from_wav(biome_song[current_biome]) # Background music
+      try:
+        song = AudioSegment.from_wav(biome_song[current_biome]) # Background music
+      except KeyError:
+         song = AudioSegment.from_wav("Clair_de_Lune.wav")
       playback = sa.play_buffer( #I'm not going to act like I understand what these are used for
           song.raw_data,
           num_channels=song.channels,
@@ -132,6 +134,7 @@ def auto_roll(collection, luck):
     while auto_roll_var.is_set():
        Gamble.Rng(collection,luck, root)
        Biome.Rng(collection, luck, root, current_biome)
+       Refresh()
        time.sleep(0.1) # The time will become a variable in future
 def auto_roll_stat():
   if auto_roll_var.is_set(): # If the auto roll is on
@@ -152,11 +155,12 @@ def Roll(collection, luck, GUI, current_biome):
    '''Just triggers both RNG functions to roll'''
    Gamble.Rng(collection, luck, GUI)
    Biome.Rng(collection, luck, GUI, current_biome)
+   Refresh()
 def set_biome(Label, Entry):
    '''Debug method to set the biome'''
    global current_biome
    current_biome = Entry.get()
-   Label.configure(text=f"Biome {current_biome}")
+   Label.configure(text=f"Biome: {current_biome}")
    sa.stop_all()
 threading.Thread(target=lambda: biome_change(biome_stat), daemon=True).start() # Constantly runs the biome changing functions (maybe)
 

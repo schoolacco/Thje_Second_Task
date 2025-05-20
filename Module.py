@@ -69,19 +69,19 @@ class Biome(Gamble):
    def Rng(collection, luck, GUI, current_biome):
     '''The actual rolling function, refer mostly loops the rolling and handles the scenario for if you get nothing, this version includes biome-exclusives and biome luck-boosts'''
     items = [
-        (1000000, "MAINFRAME", "MAINFRAME"), (100, "ItemE", "MAINFRAME"), (1000, "MAINFRAME", "MAINFRAME//FALLEN"), (2, "ItemE", "MAINFRAME//FALLEN")
+        (1000000, "MAINFRAME", "MAINFRAME"), (100, "ItemE", "MAINFRAME"), (1000, "MAINFRAME", "MAINFRAME//FALLEN"), (2, "ItemE", "MAINFRAME//FALLEN"), (1e12, "Apex Predator", ("HIS Domain", "MAINFRAME"))
     ]
     for chance, name, biome in items:
         result = Biome.insert(current_biome, biome, collection, luck, chance, name, GUI)
         if result == "Success":
             return  # Stop rolling on success
-    # If no success after all attempts
-    collection["Item1"] = collection.get("Item1", 0) + 1
    def insert(current_biome, biome, collection, luck, chance, name, GUI):
       '''Just simplification to avoid clutter, simply adds to the collection, now also runs the cutscene'''
-      if random.randint(0,round(chance/luck)) == 0 and current_biome == biome:
+      if random.randint(0,round(chance/luck)) == 0 and current_biome in biome:
           if name == "MAINFRAME":
              GUI.after(0, lambda: Gamble.Cutscene(colours=["#E5CC99", "#E59796", "#FFFFFF", "#BBE6A8", "#BF80E5","#ABD6EB"], texts=["MAINFRAME", "POWER", "OVERWHELMING", "CORRUPTION", "UNSTABLE", "ERROR", "FAILURE"], GUI=GUI, wav="Why.wav")) # This may look complicated, but it just defines some variables for the function, notably lists of what to flash through
+          elif name == "Apex Predator":
+             GUI.after(0, lambda: Gamble.Cutscene(colours=["Yellow", "Black"], texts=["Quack"], GUI=GUI, wav="Quack.wav"))
           if name not in collection:
               collection[name] = 1
               return "Success"
