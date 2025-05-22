@@ -1,7 +1,7 @@
 from tkinter import * # For the GUIs as always
 from tkinter import ttk # Specifically for the notebook tabs
 from PIL import ImageTk, Image # Just so I can change the window icon
-from Module import Gamble, Gear, SaveLoad, Biome # My module
+from Module import Gamble, Gear, SaveLoad, Biome, God_Roll # My module
 from pydub import AudioSegment # Convert the music into useful data
 import simpleaudio as sa # Play the music
 import threading # Asynchio but simple, essentially runs programs within the program
@@ -11,6 +11,8 @@ import time # Force stops the program for a period of time, compatible with thre
 biome_song = {"Normal": "Clair_de_Lune.wav", "Paradiso": "Ascension_to_Heaven.wav", "HIS Domain": "In_the_House,_in_a_Heartbeat.wav", "MAINFRAME": "Your_Friend_Equals_false.wav", "MAINFRAME//FALLEN": "Fallen_Symphony.wav"}
 admin = False # This just sets the global variables
 current_biome = "Normal"
+God_Roll_req = 20000
+God_roll = 0
 def load_collection():
    '''This accesses your save file using the load function, and updates your collection to reflect it'''
    data = SaveLoad.Load()
@@ -149,12 +151,43 @@ def biome_change(Label):
      current_biome = Biome.biome_change() # Run the function to change the biome, and set the current biome to it.
      Label.configure(text=f"Biome: {current_biome}") # Sets a label so the user can see
      sa.stop_all()
-def Roll(collection, luck, GUI, current_biome):
+def Roll(collection, luck, GUI, current_biome, fin_luck):
    '''Just triggers both RNG functions to roll'''
+   global God_Roll_req
+   luck *= fin_luck
    stat = Biome.Rng(collection, luck, GUI, current_biome)
    if stat != "Success":
      Gamble.Rng(collection, luck, GUI)
    Refresh()
+   God_Roll_req -= 1
+   if God_Roll_req <= 0:
+      God_roll += 1
+      if God_roll == 1:
+        GButton = Button(rng_frame, text=f"God Roll: {God_roll}", bg="black", fg="white", command=lambda: god_roll(collection, fin_luck, GUI, current_biome))
+        GButton.pack()
+      else:
+        GButton.configure(text=f"God Roll: {God_roll}")
+def god_roll(collection, fin_luck, GUI, current_biome):
+   global God_Roll_req
+   God_roll -= 1
+   luck *= fin_luck
+   stat = God_Roll.Rng(collection, fin_luck, GUI, current_biome)
+   if stat != "Success":
+      stat = Biome.Rng(collection, luck=(luck*50000), GUI=GUI, current_biome=current_biome)
+   if stat != "Success":
+      Gamble.Rng(collection, luck=(luck*50000), GUI=GUI, current_biome=current_biome)
+   Refresh()
+   God_Roll_req -= 1
+   if God_Roll_req <= 0:
+      God_roll += 1
+      if God_roll == 1:
+        GButton = Button(rng_frame, text=f"God Roll: {God_roll}", bg="black", fg="white", command=lambda: god_roll(collection, fin_luck, GUI, current_biome))
+        GButton.pack()
+      else:
+        GButton.configure(text=f"God Roll: {God_roll}")
+   if God_roll == 0 and GButton.winfo_exists():
+      GButton.destroy()
+
 def set_biome(Label, Entry):
    '''Debug method to set the biome'''
    global current_biome

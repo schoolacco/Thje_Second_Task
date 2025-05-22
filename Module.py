@@ -11,6 +11,7 @@ class Gamble:
       '''Initialises variables'''
       self.chance = int(chance)
       self.name = name
+  @staticmethod
   def insert(collection, luck, chance, name, GUI):
       '''Just simplification to avoid clutter, simply adds to the collection, now also runs the cutscene'''
       if random.randint(0,round(chance/luck)) == 0:
@@ -24,6 +25,7 @@ class Gamble:
               return "Success"
       else:
           return "Failure"
+  @staticmethod
   def Rng(collection, luck, GUI):
     '''The actual rolling function, refer mostly loops the rolling and handles the scenario for if you get nothing'''
     items = [
@@ -37,6 +39,7 @@ class Gamble:
             return  # Stop rolling on success
     # If no success after all attempts
     collection["Item1"] = collection.get("Item1", 0) + 1
+  @staticmethod
   def Cutscene(texts, colours, GUI, wav):
      '''A foundation for any cutscenes I choose to create, flashes through text and colour and uses some music'''
      cutscene = Toplevel(GUI) # Keep relevant parts from prior GUI i.e. the title
@@ -66,6 +69,7 @@ class Biome(Gamble):
    def __init__(self, chance, name, biome):
       super().__init__(chance, name)
       self.biome = biome
+   @staticmethod
    def Rng(collection, luck, GUI, current_biome):
     '''The actual rolling function, refer mostly loops the rolling and handles the scenario for if you get nothing, this version includes biome-exclusives and biome luck-boosts'''
     items = [
@@ -75,6 +79,7 @@ class Biome(Gamble):
         result = Biome.insert(current_biome, biome, collection, luck, chance, name, GUI)
         if result == "Success":
             return  "Success" # Stop rolling on success
+   @staticmethod
    def insert(current_biome, biome, collection, luck, chance, name, GUI):
       '''Just simplification to avoid clutter, simply adds to the collection, now also runs the cutscene'''
       if random.randint(0,round(chance/luck)) == 0 and current_biome in biome:
@@ -90,6 +95,7 @@ class Biome(Gamble):
               return "Success"
       else:
           return "Failure"
+   @staticmethod
    def biome_change():
       '''Changes the biome'''
       biomes = [
@@ -101,12 +107,37 @@ class Biome(Gamble):
             return result[1]
       # If no success after all attempts
       return "Normal"
+   @staticmethod
    def biome_roll(name, chance):
       '''A simplified version of the "insert" function for specifically the biome'''
       if random.randint(0,chance) == 0:
          return ["Success", name]
       else:
          return "Failure"
+class God_Roll(Gamble):
+   @staticmethod
+   def Rng(collection, fin_luck, GUI, current_biome):
+      items = [
+       ("HIM", 1e6, "HIS Domain")
+      ]
+      for chance, name, biome in items:
+        result = Biome.insert(current_biome, biome, collection, fin_luck, chance, name, GUI)
+        if result == "Success":
+           return "Success"
+   @staticmethod
+   def insert(current_biome, biome, collection, luck, chance, name, GUI):
+    if random.randint(0,round(chance/luck)) == 0 and current_biome in biome:
+       if name == "HIM":
+        GUI.after(0, lambda: Gamble.Cutscene(colours=["#3b0808", "#000000", "#611c1c", "#380404", "#361515"], texts=["DID", "YOU", "EVER", "THINK", "YOU", "STOOD", "A", "CHANCE?"], GUI=GUI, wav="Why.wav"))
+       if name not in collection:
+          collection[name] = 1
+          return "Success"
+       else:
+          collection[name] += 1
+          return "Success"
+    else:
+       return "Failure"
+
 
 
 class Gear:
@@ -128,6 +159,7 @@ class Gear:
      else:
          print("Requirements not met")
 class SaveLoad:
+    @staticmethod
     def Save(collection):
         '''Saves your data to a json file, and makes the previous file a backup'''
         try:
@@ -140,6 +172,7 @@ class SaveLoad:
             json.dump(collection, file)
         except json.JSONDecodeError: # If file is corrupted
            print("WARNING: Your back up file or main save file is CORRUPTED")
+    @staticmethod
     def Load():
        '''Load your data from your savefile'''
        if os.path.exists("savefile.json"): # If you have saved before
