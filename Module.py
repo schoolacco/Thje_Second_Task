@@ -120,8 +120,8 @@ class God_Roll(Gamble):
       items = [
        ("HIM", 1e6, "HIS Domain")
       ]
-      for chance, name, biome in items:
-        result = Biome.insert(current_biome, biome, collection, fin_luck, chance, name, GUI)
+      for name, chance, biome in items:
+        result = God_Roll.insert(current_biome, biome, collection, fin_luck, chance, name, GUI)
         if result == "Success":
            return "Success"
    @staticmethod
@@ -160,8 +160,9 @@ class Gear:
          print("Requirements not met")
 class SaveLoad:
     @staticmethod
-    def Save(collection):
+    def Save(collection, God_roll):
         '''Saves your data to a json file, and makes the previous file a backup'''
+        collection["God Roll"] = God_roll
         try:
           if os.path.exists("savefile.json") and collection != {}: # If there is a savefile and your collection isn't empty
             with open("savefile.json", "r") as file: # Read the file

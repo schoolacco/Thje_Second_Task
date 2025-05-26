@@ -15,8 +15,17 @@ God_Roll_req = 20000
 God_roll = 0
 def load_collection():
    '''This accesses your save file using the load function, and updates your collection to reflect it'''
+   global God_roll, GButton
    data = SaveLoad.Load()
    if data: # If the data exists
+      try:
+        God_roll = data["God Roll"]
+        del data["God Roll"]
+        GButton = Button(rng_frame, text=f"God Roll: {God_roll}", bg="black", fg="white", command=lambda: god_roll(collection, fin_luck, root, current_biome))
+        if God_roll > 0:
+           GButton.pack()
+      except KeyError:
+         pass
       collection.clear() # Empty dictionary
       collection.update(data) # Fill dictionary with json data
       Refresh() # Update collection tab
@@ -36,6 +45,7 @@ def ADMIN():
 auto_roll_var = threading.Event() # Set this to an event
 collection = {}
 luck = 1
+fin_luck = 1
 root = Tk() # Basic set up stuff
 root.title("TooRNG")
 root.configure(bg="black")
@@ -52,10 +62,12 @@ s.configure('TFrame', background="black") #Change Style() to create bgs for fram
 '''----------RNG----------'''
 rng_frame = ttk.Frame(Nb, width=2000, height=2000, style='TFrame') #Create a tab in the notebook
 Label(rng_frame, text="There is nothing much to say, click the button to begin.", bg="black", fg="white", anchor="center").pack()
-roll = Button(rng_frame, text="Roll", command=lambda: Roll(collection, luck, root, current_biome), bg="black", fg="white") # Create a button which runs the rng command
+roll = Button(rng_frame, text="Roll", command=lambda: Roll(collection, luck, root, current_biome, fin_luck), bg="black", fg="white") # Create a button which runs the rng command
 roll.pack()
 biome_stat = Label(rng_frame, text="Biome: Normal", bg="black", fg="white")
 biome_stat.pack()
+Req_Label = Label(rng_frame, text=f"Rolls till next God Roll: {God_Roll_req}", bg="black", fg="white")
+Req_Label.pack()
 rng_frame.pack()
 Nb.add(rng_frame, text="RNG")
 '''----------Collection----------'''
@@ -77,7 +89,7 @@ Nb.add(gear_frame, text="Crafting")
 
 '''----------Save/Load----------'''
 save_frame = ttk.Frame(Nb, width=2000, height=2000, style='TFrame')
-Button(save_frame, text="Save", bg="black", fg="white", command=lambda: SaveLoad.Save(collection)).pack() # Create a button to save your data 
+Button(save_frame, text="Save", bg="black", fg="white", command=lambda: SaveLoad.Save(collection, God_roll)).pack() # Create a button to save your data 
 Button(save_frame, text="Load", bg="black", fg="white", command=lambda: load_collection()).pack() # Create a button to load your data
 save_frame.pack()
 Nb.add(save_frame, text="Save/Load")
@@ -94,6 +106,9 @@ admin_frame = ttk.Frame(Nb, width=2000, height=2000, style='TFrame')
 Label(admin_frame, text="Luck", bg="black", fg="white").pack()
 Luck_entry = Entry(admin_frame)
 Luck_entry.pack()
+Label(admin_frame,text="God Rolls", bg="black", fg="white").pack()
+Roll_entry = Entry(admin_frame)
+Roll_entry.pack()
 def Luck():
    '''Set luck to a value for debugging or cheating'''
    global luck
@@ -101,11 +116,38 @@ def Luck():
       luck = float(Luck_entry.get())
    except ValueError:
       pass
+def Fin_Luck():
+   global fin_luck
+   try:
+      fin_luck = float(FinLuck_entry.get())
+   except ValueError:
+      pass
+def Set_God_Roll():
+   '''Set the amount of God rolls for debugging or cheating'''
+   global God_roll, GButton, fin_luck
+   try:
+      God_roll = int(Roll_entry.get())
+      try:
+        if God_roll < 0 and GButton.winfo_exists() == False:
+          GButton = Button(rng_frame, text=f"God Roll: {God_roll}", bg="black", fg="white", command=lambda: god_roll(collection, fin_luck, root, current_biome))
+          GButton.pack()
+        else:
+          GButton.configure(text=f"God Roll: {God_roll}")
+      except:
+        GButton = Button(rng_frame, text=f"God Roll: {God_roll}", bg="black", fg="white", command=lambda: god_roll(collection, fin_luck, root, current_biome))
+        GButton.pack()
+   except ValueError:
+      pass 
 Button(admin_frame, text="Set Luck", bg="black", fg="white", command=lambda:Luck()).pack() # Set the luck
+Label(admin_frame, text="Final Luck", bg="black", fg="white").pack()
+FinLuck_entry = Entry(admin_frame)
+FinLuck_entry.pack()
+Button(admin_frame, text="Set Final Luck", bg="black", fg="white", command=lambda: Fin_Luck()).pack()
 Label(admin_frame, text="Set Biome", bg="black", fg="white").pack()
 Biome_entry = Entry(admin_frame)
 Biome_entry.pack()
 Button(admin_frame, text="Set Biome", bg="black", fg="white", command= lambda: set_biome(biome_stat, Biome_entry)).pack()
+Button(admin_frame, text="Set God Rolls", bg="black", fg="white", command=lambda: Set_God_Roll()).pack()
 Button(admin_frame, text="Auto Roll", bg="black", fg="white", command=lambda: auto_roll_stat()).pack() # Change the status of the auto roll
 Button(admin_frame, text="Hide The Evidence", bg="black", fg="white", command=lambda: Hide()).pack() # What ADMIN frame? You're imagining things
 '''----------Music----------'''
@@ -131,17 +173,17 @@ threading.Thread(target=play_music, daemon=True).start() # Asynchio but not comp
 
 '''----------Rolling----------'''
 
-def auto_roll(collection, luck):
+def auto_roll(collection, luck, fin_luck):
     '''Simple code for a future feature, automatically runs the roll function in the background'''
     while auto_roll_var.is_set():
-       Roll(collection, luck, root, current_biome)
+       Roll(collection, luck, root, current_biome, fin_luck)
        time.sleep(0.1) # The time will become a variable in future
 def auto_roll_stat():
   if auto_roll_var.is_set(): # If the auto roll is on
      auto_roll_var.clear() # Disable it
   else:
     auto_roll_var.set()
-    threading.Thread(target= lambda: auto_roll(collection, luck), daemon=True).start() # Start autorolling with freezing the GUI
+    threading.Thread(target= lambda: auto_roll(collection, luck, fin_luck), daemon=True).start() # Start autorolling with freezing the GUI
 # auto_roll_var.set() to enable, auto_roll_var.clear() to disable
 def biome_change(Label):
    '''Changes the biome, who would've guessed?'''
@@ -153,13 +195,14 @@ def biome_change(Label):
      sa.stop_all()
 def Roll(collection, luck, GUI, current_biome, fin_luck):
    '''Just triggers both RNG functions to roll'''
-   global God_Roll_req
+   global God_Roll_req, God_roll, Req_Label
    luck *= fin_luck
    stat = Biome.Rng(collection, luck, GUI, current_biome)
    if stat != "Success":
      Gamble.Rng(collection, luck, GUI)
    Refresh()
    God_Roll_req -= 1
+   Req_Label.configure(text=f"Rolls till next God Roll: {God_Roll_req}")
    if God_Roll_req <= 0:
       God_roll += 1
       if God_roll == 1:
@@ -168,23 +211,23 @@ def Roll(collection, luck, GUI, current_biome, fin_luck):
       else:
         GButton.configure(text=f"God Roll: {God_roll}")
 def god_roll(collection, fin_luck, GUI, current_biome):
-   global God_Roll_req
+   global God_Roll_req, God_roll, luck, GButton, Req_Label
    God_roll -= 1
    luck *= fin_luck
    stat = God_Roll.Rng(collection, fin_luck, GUI, current_biome)
    if stat != "Success":
       stat = Biome.Rng(collection, luck=(luck*50000), GUI=GUI, current_biome=current_biome)
    if stat != "Success":
-      Gamble.Rng(collection, luck=(luck*50000), GUI=GUI, current_biome=current_biome)
+      Gamble.Rng(collection, luck=(luck*50000), GUI=GUI)
    Refresh()
    God_Roll_req -= 1
+   Req_Label.configure(text=f"Rolls till next God Roll: {God_Roll_req}")
    if God_Roll_req <= 0:
       God_roll += 1
       if God_roll == 1:
         GButton = Button(rng_frame, text=f"God Roll: {God_roll}", bg="black", fg="white", command=lambda: god_roll(collection, fin_luck, GUI, current_biome))
         GButton.pack()
-      else:
-        GButton.configure(text=f"God Roll: {God_roll}")
+   GButton.configure(text=f"God Roll: {God_roll}")
    if God_roll == 0 and GButton.winfo_exists():
       GButton.destroy()
 
