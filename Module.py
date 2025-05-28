@@ -118,7 +118,7 @@ class God_Roll(Gamble):
    @staticmethod
    def Rng(collection, fin_luck, GUI, current_biome):
       items = [
-       ("HIM", 1e6, "HIS Domain")
+       ("HIM", 1e6, ("HIS Domain", "MAINFRAME")), ("S U P R E M A C Y", 1000, "Any")
       ]
       for name, chance, biome in items:
         result = God_Roll.insert(current_biome, biome, collection, fin_luck, chance, name, GUI)
@@ -126,6 +126,8 @@ class God_Roll(Gamble):
            return "Success"
    @staticmethod
    def insert(current_biome, biome, collection, luck, chance, name, GUI):
+    if biome == "Any":
+       biome = current_biome
     if random.randint(0,round(chance/luck)) == 0 and current_biome in biome:
        if name == "HIM":
         GUI.after(0, lambda: Gamble.Cutscene(colours=["#3b0808", "#000000", "#611c1c", "#380404", "#361515"], texts=["DID", "YOU", "EVER", "THINK", "YOU", "STOOD", "A", "CHANCE?"], GUI=GUI, wav="Why.wav"))
@@ -153,11 +155,25 @@ class Gear:
           return  all(collection.get(k,0) >= v for k,v in self.requirements.items()) # All only returns true if everything value is satisfied, collections.get(k,0) essentially tries to find the key and retrieve the value else it will default to 0, the rest is simple, checking if the value is greater than or equal to that of the pre-defined requirements
     def equip(self, luck, collection):
      '''Simple code that increases luck based on the gear luck boost, speed boost will be added in future'''
-     if Gear.check_requirements(self, collection):
+     if self.check_requirements(collection):
        luck = luck * self.luck_boost # Change value of luck
        return luck
      else:
          print("Requirements not met")
+class Late_Gear(Gear):
+   def __init__(self, requirements, name, luck_boost, speed_boost, fin_luck_boost):
+      super().__init__(requirements, name, luck_boost)
+      self.speed_boost = speed_boost
+      self.fin_luck = fin_luck_boost
+   def check_requirements(self, collection):
+      return super().check_requirements(collection)
+   def equip(self, luck, speed, fin_luck, collection):
+      super().equip(luck, collection)
+      if self.check_requirements(collection):
+         speed %= self.speed_boost
+         fin_luck *= self.fin_luck
+      return [luck, speed, fin_luck]
+
 class SaveLoad:
     @staticmethod
     def Save(collection, God_roll):
