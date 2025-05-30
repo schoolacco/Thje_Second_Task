@@ -16,11 +16,23 @@ current_biome = "Normal"
 God_Roll_req = 20000
 God_roll = 0
 speed = 1
-def equip(luck_boost, speed_boost = 1, fin_luck_boost = 1):
-   global luck, fin_luck, speed
-   luck *= luck_boost
-   speed /= speed_boost
-   fin_luck *= fin_luck_boost
+def equip(gear):
+   global luck, fin_luck, speed, collection
+   luck = fin_luck = speed = 1
+   if not gear.check_requirements(collection):
+      return
+   try:
+     luck *= gear.luck_boost
+   except AttributeError:
+      luck = 1
+   try:
+     speed /= gear.speed_boost
+   except AttributeError:
+      speed = 1
+   try:
+     fin_luck *= gear.fin_luck
+   except AttributeError:
+      fin_luck = 1
 def load_collection():
    '''This accesses your save file using the load function, and updates your collection to reflect it'''
    global God_roll, GButton
@@ -91,10 +103,9 @@ Nb.add(collection_frame, text='Collection')
 '''----------Crafting----------'''
 gear_frame = ttk.Frame(Nb, width=2000, height=2000, style='TFrame')
 Gear1 = Gear(name="Gear1", requirements={"Item1": 100, "Item3": 10}, luck_boost=2) # Create a gear
-Button(gear_frame, text="Equip Gear1", bg="black", fg="white", command=lambda: equip(Gear.equip(Gear1, luck, collection))).pack() # Unequiping will be inserted in future
+Button(gear_frame, text="Equip Gear1", bg="black", fg="white", command=lambda: equip(Gear1)).pack() # Unequiping will be inserted in future
 Deus = Late_Gear(name="Deus Ex Machina", requirements={"HIM": 666, "MAINFRAME": 1e5, "Apex Predator": 1e4, "The Figure": 777, "Wizard10989": 1}, luck_boost=1e6, speed_boost=1e3, fin_luck_boost=100)
-gear = Late_Gear.equip(Deus, luck, speed, fin_luck, collection)
-Button(gear_frame, text="Equip Deus Ex Machina", bg="black", fg="white", command=lambda: equip(gear[0], gear[1], gear[2])).pack()
+Button(gear_frame, text="Equip Deus Ex Machina", bg="black", fg="white", command=lambda: equip(Deus)).pack()
 gear_frame.pack()
 Nb.add(gear_frame, text="Crafting")
 

@@ -172,7 +172,6 @@ class Late_Gear(Gear):
       if self.check_requirements(collection):
          speed %= self.speed_boost
          fin_luck *= self.fin_luck
-      return [luck, speed, fin_luck]
 
 class SaveLoad:
     @staticmethod
