@@ -5,17 +5,25 @@ from tkinter import *
 from pydub import AudioSegment
 import threading
 import simpleaudio as sa
+from abc import abstractmethod, ABC
+class ROLL(ABC):
+   @abstractmethod
+   def insert(collection, luck, chance, name, GUI, threshold):
+      pass # I don't really understand why abcs are nessecary, but if they're being marked they're here.
+   @abstractmethod
+   def Rng(collection, luck, GUI, threshold):
+      pass
 # It's about as bad as the main program
-class Gamble:
+class Gamble(ROLL):
   def __init__(self, chance, name):
       '''Initialises variables'''
       self.chance = int(chance)
       self.name = name
   @staticmethod
-  def insert(collection, luck, chance, name, GUI):
+  def insert(collection, luck, chance, name, GUI, threshold):
       '''Just simplification to avoid clutter, simply adds to the collection, now also runs the cutscene'''
       if random.randint(0,round(chance/luck)) == 0:
-          if name == "MAINFRAME":
+          if name == "MAINFRAME" and int(chance) > threshold:
              GUI.after(0, lambda: Gamble.Cutscene(colours=["#E5CC99", "#E59796", "#FFFFFF", "#BBE6A8", "#BF80E5","#ABD6EB"], texts=["MAINFRAME", "POWER", "OVERWHELMING", "CORRUPTION", "UNSTABLE", "ERROR", "FAILURE"], GUI=GUI, wav="Why.wav")) # This may look complicated, but it just defines some variables for the function, notably lists of what to flash through
           if name not in collection:
               collection[name] = 1
@@ -26,7 +34,7 @@ class Gamble:
       else:
           return "Failure"
   @staticmethod
-  def Rng(collection, luck, GUI):
+  def Rng(collection, luck, GUI, threshold):
     '''The actual rolling function, refer mostly loops the rolling and handles the scenario for if you get nothing'''
     items = [
         (1000000000, "MAINFRAME"),
@@ -34,7 +42,7 @@ class Gamble:
         (10, "Item3")
     ]
     for chance, name in items:
-        result = Gamble.insert(collection, luck, chance, name, GUI)
+        result = Gamble.insert(collection, luck, chance, name, GUI, threshold)
         if result == "Success":
             return  # Stop rolling on success
     # If no success after all attempts
@@ -65,27 +73,55 @@ class Gamble:
        else:
          cutscene.destroy() # After finishing destroy the GUI
      effect(step) # Begin the effect
-class Biome(Gamble):
+  @staticmethod
+  def Cutscene_2(text, colours, GUI, wav):
+     cutscene = Toplevel(GUI)
+     cutscene.state('zoomed')
+     cutscene.focus_force()
+     song = AudioSegment.from_wav(wav)
+     threading.Thread(target= lambda: sa.play_buffer(song.raw_data, num_channels=song.channels, bytes_per_sample=song.sample_width, sample_rate=song.frame_rate), daemon=True).start()
+     text2 = Label(cutscene, text="", font=("Arial", 40), fg="white", bg="black")
+     text2.pack(expand=TRUE)
+     inter = 4500//len(text)
+     steps = 3000//len(text)
+     step = 0
+     sent = "" #sentence
+     def effect(step, sentence):
+        if step < steps:
+           bg=colours[step%len(colours)]
+           if step < len(text):
+             sentence += text[step%len(text)]
+           text_change = sentence
+           cutscene.config(bg=bg)
+           text2.config(text=text_change, bg=bg)
+           step += 1
+           cutscene.after(inter, lambda: effect(step, sentence))
+        else:
+           cutscene.destroy()
+     effect(step, sent)
+      
+
+class Biome(ROLL):
    def __init__(self, chance, name, biome):
       super().__init__(chance, name)
       self.biome = biome
    @staticmethod
-   def Rng(collection, luck, GUI, current_biome):
+   def Rng(collection, luck, GUI, current_biome, threshold):
     '''The actual rolling function, refer mostly loops the rolling and handles the scenario for if you get nothing, this version includes biome-exclusives and biome luck-boosts'''
     items = [
-        (1000000, "MAINFRAME", "MAINFRAME"), (100, "ItemE", "MAINFRAME"), (1000, "MAINFRAME", "MAINFRAME//FALLEN"), (2, "ItemE", "MAINFRAME//FALLEN"), (1e12, "Apex Predator", ("HIS Domain", "MAINFRAME"))
+        (1000000, "MAINFRAME", "MAINFRAME"), (100, "ItemE", "MAINFRAME"), (1000, "MAINFRAME", "MAINFRAME//FALLEN"), (2, "ItemE", "MAINFRAME//FALLEN"), (1e12, "Apex Predator", ("HIS Domain", "MAINFRAME")), (14219837, "The First Vessel//DataNull", ("MAINFRAME", "MAINFRAME//FALLEN"))
     ]
     for chance, name, biome in items:
-        result = Biome.insert(current_biome, biome, collection, luck, chance, name, GUI)
+        result = Biome.insert(current_biome, biome, collection, luck, chance, name, GUI, threshold)
         if result == "Success":
             return  "Success" # Stop rolling on success
    @staticmethod
-   def insert(current_biome, biome, collection, luck, chance, name, GUI):
+   def insert(current_biome, biome, collection, luck, chance, name, GUI, threshold):
       '''Just simplification to avoid clutter, simply adds to the collection, now also runs the cutscene'''
       if random.randint(0,round(chance/luck)) == 0 and current_biome in biome:
-          if name == "MAINFRAME":
+          if name == "MAINFRAME" and int(chance) > threshold:
              GUI.after(0, lambda: Gamble.Cutscene(colours=["#E5CC99", "#E59796", "#FFFFFF", "#BBE6A8", "#BF80E5","#ABD6EB"], texts=["MAINFRAME", "POWER", "OVERWHELMING", "CORRUPTION", "UNSTABLE", "ERROR", "FAILURE"], GUI=GUI, wav="Why.wav")) # This may look complicated, but it just defines some variables for the function, notably lists of what to flash through
-          elif name == "Apex Predator":
+          elif name == "Apex Predator" and chance > threshold:
              GUI.after(0, lambda: Gamble.Cutscene(colours=["Yellow", "Black"], texts=["Quack"], GUI=GUI, wav="Quack.wav"))
           if name not in collection:
               collection[name] = 1
@@ -99,7 +135,7 @@ class Biome(Gamble):
    def biome_change():
       '''Changes the biome'''
       biomes = [
-          (500, "MAINFRAME"), (100, "Paradiso"), (100, "HIS Domain"), (5000, "MAINFRAME//FALLEN")
+          (500, "MAINFRAME"), (100, "Paradiso"), (100, "HIS Domain"), (5000, "MAINFRAME//FALLEN"), (10, "Shardscapes")
       ]
       for chance, name in biomes:
          result = Biome.biome_roll(name, chance)
@@ -114,11 +150,11 @@ class Biome(Gamble):
          return ["Success", name]
       else:
          return "Failure"
-class God_Roll(Gamble):
+class God_Roll(ROLL):
    @staticmethod
    def Rng(collection, fin_luck, GUI, current_biome):
       items = [
-       ("HIM", 1e6, ("HIS Domain", "MAINFRAME")), ("S U P R E M A C Y", 1000, "Any")
+       ("HIM", 6666666, ("HIS Domain", "MAINFRAME")), ("Wizard10989", 10101010101, ("MAINFRAME")), ("Wizard10989", 10989469, ("MAINFRAME//FALLEN")), ("HIM", 666666, ("MAINFRAME//FALLEN")), ("The Figure", 7777777, ("Paradiso, MAINFRAME")), ("The Figure", 777777, ("MAINFRAME//FALLEN")), ("YOU", 1e12, "MAINFRAME"), ("YOU", 1e10, "MAINFRAME//FALLEN"), ("The First Vessel//S U P R E M A C Y", 1000, ("MAINFRAME", "MAINFRAME//FALLEN")), ("S U P R E M A C Y", 1000, "Any")
       ]
       for name, chance, biome in items:
         result = God_Roll.insert(current_biome, biome, collection, fin_luck, chance, name, GUI)
@@ -130,7 +166,7 @@ class God_Roll(Gamble):
        biome = current_biome
     if random.randint(0,round(chance/luck)) == 0 and current_biome in biome:
        if name == "HIM":
-        GUI.after(0, lambda: Gamble.Cutscene(colours=["#3b0808", "#000000", "#611c1c", "#380404", "#361515"], texts=["DID", "YOU", "EVER", "THINK", "YOU", "STOOD", "A", "CHANCE?"], GUI=GUI, wav="Why.wav"))
+        GUI.after(0, lambda: Gamble.Cutscene_2(colours=["#3b0808", "#000000", "#611c1c", "#380404", "#361515"], text="DID YOU EVER THINK YOU STOOD A CHANCE?", GUI=GUI, wav="Why.wav"))
        if name not in collection:
           collection[name] = 1
           return "Success"
@@ -175,9 +211,10 @@ class Late_Gear(Gear):
 
 class SaveLoad:
     @staticmethod
-    def Save(collection, God_roll):
+    def Save(collection, God_roll, God_Roll_req):
         '''Saves your data to a json file, and makes the previous file a backup'''
         collection["God Roll"] = God_roll
+        collection["God Roll Requirement"] = God_Roll_req
         try:
           if os.path.exists("savefile.json") and collection != {}: # If there is a savefile and your collection isn't empty
             with open("savefile.json", "r") as file: # Read the file
