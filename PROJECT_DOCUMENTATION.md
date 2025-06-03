@@ -64,7 +64,9 @@
 # Sprint 2
 
 ## Design
-Add storyboard and data flow diagram
+
+![Minorly complex Structure Chart](Structure.png)
+*Too large to download :(*
 
 ## Build and Test
 ```Python

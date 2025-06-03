@@ -4,16 +4,16 @@ This Python program acts as a generic RNG game, why would you waste your time pl
 
 ## Features
 - Save and Load
-- Rolling for one of 4 items
-- Cutscene for 1 item
-- A gear to increase your luck
+- Rolling for one of many items
+- Cutscene for some items
+- Gears to increase your luck
 - ???
 - A way to view your collection
+- Basic settings
 
 ## Requirements
 To run this program, you need to install the following dependencies:
 
-- `pillow` for the icon photo.
 - `simpleaudio` to play music.
 - `pydub` to convert the music into data which `simpleaudio` understands
 - `ffmpeg` to run pydub download [here](https://www.gyan.dev/ffmpeg/builds/)
@@ -33,6 +33,8 @@ Refer to the above links.
 <br>
 Extract it to:
 ![Guide Image](Disk.png)
+<br>
+Now at this point I reccomend renaming the folder to ffmpeg. Also ensure that it is only one folder deep (i.e. when you open the folder you will immediately see multiple folders instead of just one folder containing everything) if it isn't just extract that inner folder and rename it to ffmpeg and replace the previous folder with it.
 <br>
 Now open this:<br>
 ![Guide Image](System.png)

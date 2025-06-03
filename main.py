@@ -274,9 +274,7 @@ def Roll(collection, luck, GUI, current_biome, fin_luck, speed, threshold):
    '''Just triggers both RNG functions to roll'''
    global God_Roll_req, God_roll, Req_Label, GButton
    luck *= fin_luck
-   stat = Biome.Rng(collection, luck, GUI, current_biome, threshold)
-   if stat != "Success":
-     Gamble.Rng(collection, luck, GUI, threshold)
+   Biome.Rng(collection, luck, GUI, current_biome, threshold)
    root.after(int(speed*1000))
    Refresh()
    God_Roll_req -= 1
@@ -296,8 +294,6 @@ def god_roll(collection, fin_luck, GUI, current_biome, speed, threshold):
    stat = God_Roll.Rng(collection, fin_luck, GUI, current_biome)
    if stat != "Success":
       stat = Biome.Rng(collection, luck=(luck*50000), GUI=GUI, current_biome=current_biome, threshold=threshold)
-   if stat != "Success":
-      Gamble.Rng(collection, luck=(luck*50000), GUI=GUI, threshold=threshold)
    root.after(int(speed*1000))
    Refresh()
    God_Roll_req -= 1

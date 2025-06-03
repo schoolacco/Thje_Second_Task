@@ -14,39 +14,18 @@ class ROLL(ABC):
    def Rng(collection, luck, GUI, threshold):
       pass
 # It's about as bad as the main program
-class Gamble(ROLL):
-  def __init__(self, chance, name):
-      '''Initialises variables'''
-      self.chance = int(chance)
+class Item():
+   def __init__(self, name, chance, biomes, description, rarity_desc, attack, defence, health, ability):
       self.name = name
-  @staticmethod
-  def insert(collection, luck, chance, name, GUI, threshold):
-      '''Just simplification to avoid clutter, simply adds to the collection, now also runs the cutscene'''
-      if random.randint(0,round(chance/luck)) == 0:
-          if name == "MAINFRAME" and int(chance) > threshold:
-             GUI.after(0, lambda: Gamble.Cutscene(colours=["#E5CC99", "#E59796", "#FFFFFF", "#BBE6A8", "#BF80E5","#ABD6EB"], texts=["MAINFRAME", "POWER", "OVERWHELMING", "CORRUPTION", "UNSTABLE", "ERROR", "FAILURE"], GUI=GUI, wav="Why.wav")) # This may look complicated, but it just defines some variables for the function, notably lists of what to flash through
-          if name not in collection:
-              collection[name] = 1
-              return "Success"
-          else:
-              collection[name] += 1
-              return "Success"
-      else:
-          return "Failure"
-  @staticmethod
-  def Rng(collection, luck, GUI, threshold):
-    '''The actual rolling function, refer mostly loops the rolling and handles the scenario for if you get nothing'''
-    items = [
-        (1000000000, "MAINFRAME"),
-        (1000, "Item2"),
-        (10, "Item3")
-    ]
-    for chance, name in items:
-        result = Gamble.insert(collection, luck, chance, name, GUI, threshold)
-        if result == "Success":
-            return  # Stop rolling on success
-    # If no success after all attempts
-    collection["Item1"] = collection.get("Item1", 0) + 1
+      self.chance = chance
+      self.biomes = biomes
+      self.desc = description
+      self.rdesc = rarity_desc
+      self.attk = attack
+      self.defence = defence
+      self.hp = health
+      self.ability = ability
+class Cutscene():
   @staticmethod
   def Cutscene(texts, colours, GUI, wav):
      '''A foundation for any cutscenes I choose to create, flashes through text and colour and uses some music'''
@@ -109,7 +88,7 @@ class Biome(ROLL):
    def Rng(collection, luck, GUI, current_biome, threshold):
     '''The actual rolling function, refer mostly loops the rolling and handles the scenario for if you get nothing, this version includes biome-exclusives and biome luck-boosts'''
     items = [
-        (1000000, "MAINFRAME", "MAINFRAME"), (100, "ItemE", "MAINFRAME"), (1000, "MAINFRAME", "MAINFRAME//FALLEN"), (2, "ItemE", "MAINFRAME//FALLEN"), (1e12, "Apex Predator", ("HIS Domain", "MAINFRAME")), (14219837, "The First Vessel//DataNull", ("MAINFRAME", "MAINFRAME//FALLEN"))
+        (1000000, "MAINFRAME", "MAINFRAME"), (100, "ItemE", "MAINFRAME"), (1000, "MAINFRAME", "MAINFRAME//FALLEN"), (2, "ItemE", "MAINFRAME//FALLEN"), (1e12, "Apex Predator", ("HIS Domain", "MAINFRAME")), (14219837, "The First Vessel//DataNull", ("MAINFRAME", "MAINFRAME//FALLEN")), (1e9, "MAINFRAME", "Any"), (1000, "Item2", "Any"), (10, "Item3", "Any")
     ]
     for chance, name, biome in items:
         result = Biome.insert(current_biome, biome, collection, luck, chance, name, GUI, threshold)
@@ -118,19 +97,17 @@ class Biome(ROLL):
    @staticmethod
    def insert(current_biome, biome, collection, luck, chance, name, GUI, threshold):
       '''Just simplification to avoid clutter, simply adds to the collection, now also runs the cutscene'''
+      if biome == "Any":
+         biome = current_biome
       if random.randint(0,round(chance/luck)) == 0 and current_biome in biome:
           if name == "MAINFRAME" and int(chance) > threshold:
-             GUI.after(0, lambda: Gamble.Cutscene(colours=["#E5CC99", "#E59796", "#FFFFFF", "#BBE6A8", "#BF80E5","#ABD6EB"], texts=["MAINFRAME", "POWER", "OVERWHELMING", "CORRUPTION", "UNSTABLE", "ERROR", "FAILURE"], GUI=GUI, wav="Why.wav")) # This may look complicated, but it just defines some variables for the function, notably lists of what to flash through
+             GUI.after(0, lambda: Cutscene.Cutscene(colours=["#E5CC99", "#E59796", "#FFFFFF", "#BBE6A8", "#BF80E5","#ABD6EB"], texts=["MAINFRAME", "POWER", "OVERWHELMING", "CORRUPTION", "UNSTABLE", "ERROR", "FAILURE"], GUI=GUI, wav="Why.wav")) # This may look complicated, but it just defines some variables for the function, notably lists of what to flash through
           elif name == "Apex Predator" and chance > threshold:
-             GUI.after(0, lambda: Gamble.Cutscene(colours=["Yellow", "Black"], texts=["Quack"], GUI=GUI, wav="Quack.wav"))
-          if name not in collection:
-              collection[name] = 1
-              return "Success"
-          else:
-              collection[name] += 1
-              return "Success"
+             GUI.after(0, lambda: Cutscene.Cutscene(colours=["Yellow", "Black"], texts=["Quack"], GUI=GUI, wav="Quack.wav"))
+          collection[name] = collection.get(name, 0) + 1
       else:
-          return "Failure"
+          collection["Item1"] = collection.get("Item1", 0) + 1
+          return
    @staticmethod
    def biome_change():
       '''Changes the biome'''
@@ -154,7 +131,7 @@ class God_Roll(ROLL):
    @staticmethod
    def Rng(collection, fin_luck, GUI, current_biome):
       items = [
-       ("HIM", 6666666, ("HIS Domain", "MAINFRAME")), ("Wizard10989", 10101010101, ("MAINFRAME")), ("Wizard10989", 10989469, ("MAINFRAME//FALLEN")), ("HIM", 666666, ("MAINFRAME//FALLEN")), ("The Figure", 7777777, ("Paradiso, MAINFRAME")), ("The Figure", 777777, ("MAINFRAME//FALLEN")), ("YOU", 1e12, "MAINFRAME"), ("YOU", 1e10, "MAINFRAME//FALLEN"), ("The First Vessel//S U P R E M A C Y", 1000, ("MAINFRAME", "MAINFRAME//FALLEN")), ("S U P R E M A C Y", 1000, "Any")
+       ("HIM", 666666, ("HIS Domain", "MAINFRAME")), ("Wizard10989", 10101010101, ("MAINFRAME")), ("Wizard10989", 10989469, ("MAINFRAME//FALLEN")), ("HIM", 66666, ("MAINFRAME//FALLEN")), ("The Figure", 777777, ("Paradiso, MAINFRAME")), ("The Figure", 77777, ("MAINFRAME//FALLEN")), ("YOU", 1e12, "MAINFRAME"), ("YOU", 1e10, "MAINFRAME//FALLEN"), ("The First Vessel//S U P R E M A C Y", 1000, ("MAINFRAME", "MAINFRAME//FALLEN")), ("S U P R E M A C Y", 1000, "Any")
       ]
       for name, chance, biome in items:
         result = God_Roll.insert(current_biome, biome, collection, fin_luck, chance, name, GUI)
@@ -166,7 +143,7 @@ class God_Roll(ROLL):
        biome = current_biome
     if random.randint(0,round(chance/luck)) == 0 and current_biome in biome:
        if name == "HIM":
-        GUI.after(0, lambda: Gamble.Cutscene_2(colours=["#3b0808", "#000000", "#611c1c", "#380404", "#361515"], text="DID YOU EVER THINK YOU STOOD A CHANCE?", GUI=GUI, wav="Why.wav"))
+        GUI.after(0, lambda: Cutscene.Cutscene_2(colours=["#3b0808", "#000000", "#611c1c", "#380404", "#361515"], text="DID YOU EVER THINK YOU STOOD A CHANCE?", GUI=GUI, wav="Why.wav"))
        if name not in collection:
           collection[name] = 1
           return "Success"
@@ -204,9 +181,9 @@ class Late_Gear(Gear):
    def check_requirements(self, collection):
       return super().check_requirements(collection)
    def equip(self, luck, speed, fin_luck, collection):
-      super().equip(luck, collection)
+      luck = super().equip(luck, collection)
       if self.check_requirements(collection):
-         speed %= self.speed_boost
+         speed /= self.speed_boost
          fin_luck *= self.fin_luck
 
 class SaveLoad:
