@@ -6,6 +6,7 @@ import simpleaudio as sa # Play the music
 import threading # Asynchio but simple, essentially runs programs within the program
 import time # Force stops the program for a period of time, compatible with threads
 import sys
+import math
 # This program is a little complex
 '''----------Initialisation----------'''
 sys.set_int_max_str_digits(int(2147483647))
@@ -102,6 +103,9 @@ root.wm_iconphoto(False, photo)
 Nb = ttk.Notebook(root, cursor="circle") # Insert notebook and change cursor
 s = ttk.Style()
 s.configure('TFrame', background="black") #Change Style() to create bgs for frames
+'''----------Item Intialisation----------'''
+#Item()
+Item("Wizard10989",(("MAINFRAME", 1010101010), ("MAINFRAME//FALLEN", 10989)), "Wizard10989 is fabled to be the creator of this world, although he denies such claims, he is thought to hold unknown amounts of power and supposedly has never put any effort into defeating his opponenets, with control over the very laws of logic itself many wonder how much can he really do...", "1/10101010 MAINFRAME Exclusive", 1e6, 1e6, 1e9,"Placeholder", True)
 '''----------RNG----------'''
 rng_frame = ttk.Frame(Nb, width=2000, height=2000, style='TFrame') #Create a tab in the notebook
 Label(rng_frame, text="There is nothing much to say, click the button to begin.", bg="black", fg="white", anchor="center").pack()

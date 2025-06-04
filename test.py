@@ -1,14 +1,6 @@
-import subprocess
-from pydub import AudioSegment
-
-# Convert the MP3 to WAV manually using ffmpeg
-subprocess.run([
-    r"C:\ffmpeg\bin\ffmpeg.exe",
-    "-y",  # Overwrite output if it exists
-    "-i", "Fallen_Symphony.mp3",
-    "temp_output.wav"
-])
-
-# Now load the WAV file
-song = AudioSegment.from_wav("temp_output.wav")
-print(f"Song length: {len(song)} ms")  # Should be correct
+from Module import Item
+class1 = Item(1, 1, 1, 1, 1, 1, 1, 1, 1)
+class2 = Item(2,2,2,2,2,2,2,2,2)
+list = Item.get_instances()
+for item in list:
+    print(item.name)

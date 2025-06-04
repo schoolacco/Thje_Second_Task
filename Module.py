@@ -6,26 +6,44 @@ from pydub import AudioSegment
 import threading
 import simpleaudio as sa
 from abc import abstractmethod, ABC
-class ROLL(ABC):
+class GEAR(ABC):
    @abstractmethod
-   def insert(collection, luck, chance, name, GUI, threshold):
+   def check_requirements(self, collection):
       pass # I don't really understand why abcs are nessecary, but if they're being marked they're here.
-   @abstractmethod
-   def Rng(collection, luck, GUI, threshold):
-      pass
 # It's about as bad as the main program
 class Item():
-   def __init__(self, name, chance, biomes, description, rarity_desc, attack, defence, health, ability):
+   instances = []
+   def __init__(self, name, chance_biome, description, rarity_desc, attack, defence, health, ability, god_roll=False, requirement=True, base_chance=10**50):
+      self.__class__.instances.append(self) #From what I understand this appends the class itself to a list
       self.name = name
-      self.chance = chance
-      self.biomes = biomes
+      self.chance = chance_biome
       self.desc = description
       self.rdesc = rarity_desc
       self.attk = attack
       self.defence = defence
       self.hp = health
       self.ability = ability
-class Cutscene():
+      self.req = requirement
+      self.roll = god_roll
+      self.base = base_chance
+   @classmethod
+   def get_instances(cls):
+      return cls.instances
+   @classmethod
+   def find(cls, name):
+      return next([i for i in cls.instances if i.name == name], None) # it checks for each value in our class instances if the name arguement of the class is equivalent to the given name, if not it continues, if so it stops and returns our final value.
+   def get_chance(self, current_biome, default):
+      for b, c in self.chance: # b = biome, c = chance
+         if b == current_biome:
+            return c
+      return default
+   def set_stats(self, new_attk, new_def, new_hp):
+      self.attk = new_attk
+      self.defence = new_def
+      self.hp = new_hp
+   def set_requirement_state(self, bool):
+      self.req = bool
+class Cutscene:
   @staticmethod
   def Cutscene(texts, colours, GUI, wav):
      '''A foundation for any cutscenes I choose to create, flashes through text and colour and uses some music'''
@@ -62,7 +80,7 @@ class Cutscene():
      text2 = Label(cutscene, text="", font=("Arial", 40), fg="white", bg="black")
      text2.pack(expand=TRUE)
      inter = 4500//len(text)
-     steps = 3000//len(text)
+     steps = len(text)
      step = 0
      sent = "" #sentence
      def effect(step, sentence):
@@ -80,26 +98,19 @@ class Cutscene():
      effect(step, sent)
       
 
-class Biome(ROLL):
-   def __init__(self, chance, name, biome):
-      super().__init__(chance, name)
-      self.biome = biome
+class Biome:
    @staticmethod
-   def Rng(collection, luck, GUI, current_biome, threshold):
+   def Rng(collection, luck, GUI, threshold, current_biome):
     '''The actual rolling function, refer mostly loops the rolling and handles the scenario for if you get nothing, this version includes biome-exclusives and biome luck-boosts'''
-    items = [
-        (1000000, "MAINFRAME", "MAINFRAME"), (100, "ItemE", "MAINFRAME"), (1000, "MAINFRAME", "MAINFRAME//FALLEN"), (2, "ItemE", "MAINFRAME//FALLEN"), (1e12, "Apex Predator", ("HIS Domain", "MAINFRAME")), (14219837, "The First Vessel//DataNull", ("MAINFRAME", "MAINFRAME//FALLEN")), (1e9, "MAINFRAME", "Any"), (1000, "Item2", "Any"), (10, "Item3", "Any")
-    ]
-    for chance, name, biome in items:
-        result = Biome.insert(current_biome, biome, collection, luck, chance, name, GUI, threshold)
+    items = Item.get_instances()
+    for item in items:
+        result = Biome.insert(collection, luck, item.get_chance(current_biome, item.base), item.name, GUI, threshold, item.req, item.roll)
         if result == "Success":
             return  "Success" # Stop rolling on success
    @staticmethod
-   def insert(current_biome, biome, collection, luck, chance, name, GUI, threshold):
+   def insert(collection, luck, chance, name, GUI, threshold, requirement, god_roll):
       '''Just simplification to avoid clutter, simply adds to the collection, now also runs the cutscene'''
-      if biome == "Any":
-         biome = current_biome
-      if random.randint(0,round(chance/luck)) == 0 and current_biome in biome:
+      if random.randint(0,round(chance/luck)) == 0 and requirement and not god_roll:
           if name == "MAINFRAME" and int(chance) > threshold:
              GUI.after(0, lambda: Cutscene.Cutscene(colours=["#E5CC99", "#E59796", "#FFFFFF", "#BBE6A8", "#BF80E5","#ABD6EB"], texts=["MAINFRAME", "POWER", "OVERWHELMING", "CORRUPTION", "UNSTABLE", "ERROR", "FAILURE"], GUI=GUI, wav="Why.wav")) # This may look complicated, but it just defines some variables for the function, notably lists of what to flash through
           elif name == "Apex Predator" and chance > threshold:
@@ -127,39 +138,31 @@ class Biome(ROLL):
          return ["Success", name]
       else:
          return "Failure"
-class God_Roll(ROLL):
+class God_Roll:
    @staticmethod
    def Rng(collection, fin_luck, GUI, current_biome):
-      items = [
-       ("HIM", 666666, ("HIS Domain", "MAINFRAME")), ("Wizard10989", 10101010101, ("MAINFRAME")), ("Wizard10989", 10989469, ("MAINFRAME//FALLEN")), ("HIM", 66666, ("MAINFRAME//FALLEN")), ("The Figure", 777777, ("Paradiso, MAINFRAME")), ("The Figure", 77777, ("MAINFRAME//FALLEN")), ("YOU", 1e12, "MAINFRAME"), ("YOU", 1e10, "MAINFRAME//FALLEN"), ("The First Vessel//S U P R E M A C Y", 1000, ("MAINFRAME", "MAINFRAME//FALLEN")), ("S U P R E M A C Y", 1000, "Any")
-      ]
-      for name, chance, biome in items:
-        result = God_Roll.insert(current_biome, biome, collection, fin_luck, chance, name, GUI)
+      items = Item.get_instances()
+      for item in items:
+        result = God_Roll.insert(collection, fin_luck, item.get_chance(current_biome, item.base), item.name, GUI, item.req, item.roll)
         if result == "Success":
            return "Success"
    @staticmethod
-   def insert(current_biome, biome, collection, luck, chance, name, GUI):
-    if biome == "Any":
-       biome = current_biome
-    if random.randint(0,round(chance/luck)) == 0 and current_biome in biome:
+   def insert(collection, luck, chance, name, GUI, requirement, god_roll):
+    if random.randint(0,round(chance/luck)) == 0 and requirement and god_roll:
        if name == "HIM":
         GUI.after(0, lambda: Cutscene.Cutscene_2(colours=["#3b0808", "#000000", "#611c1c", "#380404", "#361515"], text="DID YOU EVER THINK YOU STOOD A CHANCE?", GUI=GUI, wav="Why.wav"))
-       if name not in collection:
-          collection[name] = 1
-          return "Success"
-       else:
-          collection[name] += 1
-          return "Success"
+       collection[name] = collection.get(name, 0) + 1
+       return "Success"
     else:
        return "Failure"
 
 
 
-class Gear:
+class Gear(GEAR):
     def __init__(self, requirements, name, luck_boost):
         '''Initialise information about the gear'''
         if isinstance(requirements, list):
-            dict(requirements)
+            requirements = dict(requirements)
         self.requirements = requirements
         self.name = name
         self.luck_boost = int(luck_boost)
@@ -185,6 +188,7 @@ class Late_Gear(Gear):
       if self.check_requirements(collection):
          speed /= self.speed_boost
          fin_luck *= self.fin_luck
+      return luck, speed, fin_luck
 
 class SaveLoad:
     @staticmethod
