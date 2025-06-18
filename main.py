@@ -101,7 +101,7 @@ def load_collection():
       try:
         God_roll = data["God Roll"]
         del data["God Roll"]
-        GButton = Button(rng_frame, text=f"God Roll: {God_roll}", bg="black", fg="white", command=lambda: god_roll(collection, luck, fin_luck, root, current_biome, speed, threshold))
+        GButton = Button(rng_frame, text=f"God Roll: {God_roll}", bg="black", fg="white", command=lambda: god_roll(collection, luck, fin_luck, root, current_biome, speed, threshold, cutscene))
         if God_roll > 0:
            GButton.pack()
       except KeyError:
@@ -315,12 +315,12 @@ def Set_God_Roll():
       God_roll = int(Roll_entry.get())
       try:
         if God_roll < 0 and GButton.winfo_exists() == False:
-          GButton = Button(rng_frame, text=f"God Roll: {God_roll}", bg="black", fg="white", command=lambda: god_roll(collection, luck, fin_luck, root, current_biome, speed))
+          GButton = Button(rng_frame, text=f"God Roll: {God_roll}", bg="black", fg="white", command=lambda: god_roll(collection, luck, fin_luck, root, current_biome, speed, threshold))
           GButton.pack()
         else:
           GButton.configure(text=f"God Roll: {God_roll}")
       except:
-        GButton = Button(rng_frame, text=f"God Roll: {God_roll}", bg="black", fg="white", command=lambda: god_roll(collection, luck, fin_luck, root, current_biome, speed))
+        GButton = Button(rng_frame, text=f"God Roll: {God_roll}", bg="black", fg="white", command=lambda: god_roll(collection, luck, fin_luck, root, current_biome, speed, threshold))
         GButton.pack()
    except ValueError:
       pass
