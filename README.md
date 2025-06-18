@@ -1,6 +1,7 @@
 # RNG Game
 
 This Python program acts as a generic RNG game, why would you waste your time playing this?
+This program was intentionally made to be as painful as possible, seriously, don't waste your time on this.
 
 ## Features
 - Save and Load
