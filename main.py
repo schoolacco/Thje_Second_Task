@@ -267,7 +267,7 @@ gear_frame.pack()
 Nb.add(gear_frame, text="Crafting")
 '''----------Save----------'''
 save_frame = ttk.Frame(Nb, width=2000, height=2000, style='TFrame')
-Button(save_frame, text="Save", bg="black", fg="white", command=lambda: SaveLoad.Save(collection, God_roll, God_Roll_req)).pack() # Create a button to save your data 
+Button(save_frame, text="Save", bg="black", fg="white", command=lambda: SaveLoad.Save(collection, God_roll, God_Roll_req, cutscene, threshold)).pack() # Create a button to save your data 
 Label(save_frame, bg="black", fg="white", text=
       '''Potential Questions:
       Why can't I load my data manually?
@@ -565,5 +565,5 @@ threading.Thread(target=lambda: biome_change(biome_stat), daemon=True).start() #
 Nb.pack(fill=BOTH, expand=TRUE) # The options make sure it fills the whole window
 if __name__ == "__main__": # Ensures program isn't imported, apparently increases security somehow
   load_collection() # Load the collection as the program starts, no cheating >:)
-  root.protocol("WM_DELETE_WINDOW", lambda: close(collection, God_roll, God_Roll_req, root, cutscene, threshold)) # Save once the window is closed,  no cheating >:(
+  root.protocol("WM_DELETE_WINDOW", lambda: close(collection, God_roll, God_Roll_req, root, cutscene=cutscene, threshold=threshold)) # Save once the window is closed,  no cheating >:(
   root.mainloop()
