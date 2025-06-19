@@ -208,7 +208,7 @@ List.pack()
 def Refresh():
   '''Updates the listbox, doesn't destroy it this time, how nice, also really confusing list syntax that I stole online and somehow managed to understand and edit'''
   global collection
-  collection = dict(zip(sorted(list(collection.keys()), key=lambda e: Item.find(e).get_chance(current_biome, Item.find(e).base)), list(collection.values())))
+  collection = dict(zip(sorted(list(collection.keys()), key=lambda e: Item.find(e).get_chance(current_biome, Item.find(e).base)), list(collection.values()))) # Really complex looking line which in summary finds the chance of each item and sorts the items via those chances.
   listvar = Variable(value=[f"{k}: {v}" for k,v in collection.items()]) #Create a list with the display of: item name: amount, use variable to turn it into something the Listbox is compatible with.
   List.configure(listvariable=listvar) # A bit nicer then destroying it right?
   List.configure(yscrollcommand= scrollbar.set)
