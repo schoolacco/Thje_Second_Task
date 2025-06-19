@@ -32,7 +32,7 @@ def get_info(event):
    except TclError: #For when the tab is switched
       pass
 def get_gear(event):
-   global Gear_List, current_gear, req_label, desc_label
+   global Gear_List, current_gear, req_label, desc_label, luck_label, speed_label, fin_label
    '''Get information from list and edit corresponding information'''
    try:
      content = Gear_List.get(Gear_List.curselection())
@@ -40,6 +40,12 @@ def get_gear(event):
      thing = ', '.join([f"{k}: {v}" for k,v in current_gear.requirements.items()])
      req_label.configure(text=f"Requirements: {thing}")
      desc_label.configure(text=f"Description: {current_gear.desc}")
+     luck_label.config(text=f"Luck Boost: {current_gear.luck_boost}")
+     speed_label.config(text=f"Speed Boost: {current_gear.speed_boost}")
+     try:
+      fin_label.config(text=f"Final Luck Boost: {current_gear.fin_luck}")
+     except AttributeError:
+      fin_label.config(text="Final Luck Boost: None")
      return
    except TclError:
       pass
@@ -54,9 +60,9 @@ def biome_info(event):
      biome_song_credit.config(text=f"Song: {content['Song']}")
    except TclError:
       pass
-def close(collection, God_roll, God_Roll_req, root, cutscene, threshold):
+def close(collection, God_roll, God_Roll_req, root, cutscene, threshold, gear):
    '''Function for what happens when program closes'''
-   SaveLoad.Save(collection, God_roll, God_Roll_req, cutscene, threshold)
+   SaveLoad.Save(collection, God_roll, God_Roll_req, cutscene, threshold, gear)
    root.destroy()
 def disable():
    global threshold, cutscene
@@ -95,7 +101,7 @@ def equip(gear, collection, label):
       pass
 def load_collection():
    '''This accesses your save file using the load function, and updates your collection to reflect it'''
-   global God_roll, God_Roll_req, GButton, collection, wiz, cutscene, threshold, cut_entry
+   global God_roll, God_Roll_req, GButton, collection, wiz, cutscene, threshold, cut_entry, current_gear
    data = SaveLoad.Load()
    if data: # If the data exists
       try:
@@ -123,6 +129,11 @@ def load_collection():
          cut_entry.insert(END, threshold)
       except KeyError:
          pass
+      try:
+        gear = data["Gear"]
+        del data["Gear"]
+      except KeyError:
+        gear = None
       collection.clear() # Empty dictionary
       try:
         for k, v in data.items():
@@ -134,6 +145,9 @@ def load_collection():
       if len(Item.get_instances()) <= len(collection) + 1:
          wiz.req = True
       Refresh() # Update collection tab
+      if gear:
+       current_gear = Gear.find(gear)
+       equip(current_gear, collection, gear_label)
 def Hide():
    '''Hides the admin frame'''
    global admin
@@ -191,6 +205,8 @@ wiz = Item("Wizard10989//???", (("MAINFRAME//FALLEN", 1e18), ("R34L1TY", 1e6)), 
 '''----------RNG----------'''
 rng_frame = ttk.Frame(Nb, width=2000, height=2000, style='TFrame') #Create a tab in the notebook
 Label(rng_frame, text="There is nothing much to say, click the button to begin.", bg="black", fg="white", anchor="center").pack()
+Label(rng_frame, text="What's a God Roll? A God Roll is a regular roll with a 50kx luck boost, it stacks with gears. There are also some items only obtainable with God Rolls which have their odds unaffected by luck but affected by final luck.", bg="black", fg="white", anchor=CENTER, wraplength=450).pack()
+Label(rng_frame, text="What's a Biome? Biomes change the background music, and also give access to biome exclusive items or boost the odds of regular items. For more info check the biome info tab.", bg="black", fg="white", anchor=CENTER, wraplength=450).pack()
 roll = Button(rng_frame, text="Roll", command=lambda: Roll(collection, luck, root, current_biome, fin_luck, speed, threshold), bg="black", fg="white") # Create a button which runs the rng command
 roll.pack()
 Button(rng_frame, text="Auto Roll", command=lambda:auto_roll_stat(),bg="black", fg="white").pack() # Some mercy
@@ -257,17 +273,23 @@ Gear_List.bind("<<ListboxSelect>>", get_gear)
 gear_label = Label(gear_frame, text="Current Gear Equipped: None", bg="black", fg="white")
 req_label = Label(gear_frame, text="Requirements: ", bg="black", fg="white", wraplength=460)
 desc_label = Label(gear_frame, text="Description: ", bg="black", fg="white", wraplength=450)
+luck_label = Label(gear_frame, text="Luck Boost: ", bg="black", fg="white", wraplength=450)
+speed_label = Label(gear_frame, text="Speed Boost: ", bg="black", fg="white", wraplength=450)
+fin_label = Label(gear_frame, text="Final Luck Boost: ", bg="black", fg="white", wraplength=450)
 Gear_List.pack()
 gear_label.pack()
 req_label.pack()
 desc_label.pack()
+luck_label.pack()
+speed_label.pack()
+fin_label.pack()
 b.pack()
 Button(gear_frame, text="Equip selected Gear", bg="black", fg="white", command = lambda: equip(current_gear,collection, gear_label)).pack()
 gear_frame.pack()
 Nb.add(gear_frame, text="Crafting")
 '''----------Save----------'''
 save_frame = ttk.Frame(Nb, width=2000, height=2000, style='TFrame')
-Button(save_frame, text="Save", bg="black", fg="white", command=lambda: SaveLoad.Save(collection, God_roll, God_Roll_req, cutscene, threshold)).pack() # Create a button to save your data 
+Button(save_frame, text="Save", bg="black", fg="white", command=lambda: SaveLoad.Save(collection, God_roll, God_Roll_req, cutscene, threshold, current_gear)).pack() # Create a button to save your data 
 Label(save_frame, bg="black", fg="white", text=
       '''Potential Questions:
       Why can't I load my data manually?
@@ -565,5 +587,5 @@ threading.Thread(target=lambda: biome_change(biome_stat), daemon=True).start() #
 Nb.pack(fill=BOTH, expand=TRUE) # The options make sure it fills the whole window
 if __name__ == "__main__": # Ensures program isn't imported, apparently increases security somehow
   load_collection() # Load the collection as the program starts, no cheating >:)
-  root.protocol("WM_DELETE_WINDOW", lambda: close(collection, God_roll, God_Roll_req, root, cutscene=cutscene, threshold=threshold)) # Save once the window is closed,  no cheating >:(
+  root.protocol("WM_DELETE_WINDOW", lambda: close(collection, God_roll, God_Roll_req, root, cutscene=cutscene, threshold=threshold, gear=current_gear)) # Save once the window is closed,  no cheating >:(
   root.mainloop()

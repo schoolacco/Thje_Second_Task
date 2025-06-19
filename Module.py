@@ -237,12 +237,13 @@ class Late_Gear(Gear):
 
 class SaveLoad:
     @staticmethod
-    def Save(collection, God_roll, God_Roll_req, cutscene, threshold):
+    def Save(collection, God_roll, God_Roll_req, cutscene, threshold, gear):
         '''Saves your data to a json file, and makes the previous file a backup'''
         collection["God Roll"] = God_roll
         collection["God Roll Requirement"] = God_Roll_req
         collection["Cutscene"] = cutscene
         collection["threshold"] = threshold
+        collection["Gear"] = gear.name
         try:
           if os.path.exists("savefile.json") and collection != {}: # If there is a savefile and your collection isn't empty
             with open("savefile.json", "r") as file: # Read the file
