@@ -101,7 +101,7 @@ def load_collection():
       try:
         God_roll = data["God Roll"]
         del data["God Roll"]
-        GButton = Button(rng_frame, text=f"God Roll: {God_roll}", bg="black", fg="white", command=lambda: god_roll(collection, luck, fin_luck, root, current_biome, speed, threshold, cutscene))
+        GButton = Button(rng_frame, text=f"God Roll: {God_roll}", bg="black", fg="white", command=lambda: god_roll(collection, luck, fin_luck, root, current_biome, speed, threshold))
         if God_roll > 0:
            GButton.pack()
       except KeyError:
@@ -171,6 +171,7 @@ Item("D.U.C.K.", (("Duck Pond", 1e8), ("MAINFRAME", 5e7), ("MAINFRAME", 5e6)), "
 Item("Item3", 10, "Desc", "1/10")
 Item("Item2", 100, "Desc", "1/100")
 Item("Human", 1000, "Clearly the lesser race.", "1/1000")
+Item("Black Shard", (("Shardscapes", 1000), ("MAINFRAME", 100), ("MAINFRAME//FALLEN", 50)), "Some kind of shard, it resonates with unknown energy", "1/1000 Shardscapes Exclusive")
 Item("Essence", 5000, "Some kind of unknown substance with potentially magical properties.", "1/5000")
 Item("Seraphim", (("Paradiso", 1e6), ("MAINFRAME", 5e5), ("MAINFRAME//FALLEN", 1e3)), 'The true form of an "angel", near godly power.', "1/1,000,000 Paradiso Exclusive")
 Item("NullData", (("MAINFRAME", 100), ("MAINFRAME//FALLEN", 10)), "The rendition of empty data, or data with the value of 'None', it lacks any properties and tends to corrupt that which interacts with it, it is believed to contain some level of information relating to it's former data.", "1/100, MAINFRAME exclusive")
@@ -185,7 +186,7 @@ Item("The First Vessel//S U P R E M A C Y", (("MAINFRAME", 1000), ("MAINFRAME//F
 Item("YOU", (("MAINFRAME", 1e50), ("MAINFRAME//FALLEN", 1e12), ("R34L1TY", 100)), "THE INTRUDER, YOU NEVER BELONGED IN THIS WORLD", "1/1,000,000,000 MAINFRAME//FALLEN Exclusive")
 Item("YOU//ICARUS", (("MAINFRAME", 1e50), ("MAINFRAME//FALLEN", 5555555555555), ("R34L1TY", 5555)), "I'm sure you know the story of Icarus... the question is now... WHERE IS THE SUN?", "1/55,555,555,555 MAINFRAME//FALLEN Exclusive")
 Item("Kronos", (("Shardscapes", 39417), ("Precipice of Eternity", 19709), ("MAINFRAME", 39417), ("MAINFRAME//FALLEN", 19709)), "The manifestation of time itself, yet also something much darker. He wanders across the plains of existence, having no greater purpose left for him, he is a benvolent reaper, and wishes to see mortals use the most out of their lives rather than carelessly waste them, after all he knows he will win, no matter if you are an immortal or someone who already stands at his doorstep.", "1/39417 Shardscapes Exclusive, God Roll Exclusive", god_roll=True)
-Item("Goose", (("Duck Pond", 110113),("R34L1TY", 1000)), "100 Humans versus 1 Gorrila? Nah, 100 Gorrilas versus 1 angry goose.", "1/110113 Duck Pond Exclusive, God Roll Exclusive", god_roll=True)
+Item("Goose", (("Duck Pond", 110113),("R34L1TY", 1000)), "The REAL Apex Predator", "1/110113 Duck Pond Exclusive, God Roll Exclusive", god_roll=True)
 wiz = Item("Wizard10989//???", (("MAINFRAME//FALLEN", 1e18), ("R34L1TY", 1e6)), "Innovation is nothing but the result of desperation.", "1/1,000,000,000,000,000,000 MAINFRAME//FALLEN Exclusive, God Roll Exclusive, only obtainable if user has every other item in the game.", requirement=False, god_roll=True)
 '''----------RNG----------'''
 rng_frame = ttk.Frame(Nb, width=2000, height=2000, style='TFrame') #Create a tab in the notebook
@@ -208,7 +209,7 @@ List.pack()
 def Refresh():
   '''Updates the listbox, doesn't destroy it this time, how nice, also really confusing list syntax that I stole online and somehow managed to understand and edit'''
   global collection
-  collection = dict(zip(sorted(list(collection.keys()), key=lambda e: Item.find(e).get_chance(current_biome, Item.find(e).base)), list(collection.values()))) # Really complex looking line which in summary finds the chance of each item and sorts the items via those chances.
+  #collection = dict(zip(sorted(list(collection.keys()), key=lambda e: Item.find(e).get_chance(current_biome, Item.find(e).base)), list(collection.values()))) # Really complex looking line which in summary finds the chance of each item and sorts the items via those chances.
   listvar = Variable(value=[f"{k}: {v}" for k,v in collection.items()]) #Create a list with the display of: item name: amount, use variable to turn it into something the Listbox is compatible with.
   List.configure(listvariable=listvar) # A bit nicer then destroying it right?
   List.configure(yscrollcommand= scrollbar.set)
@@ -240,9 +241,11 @@ gear_frame = ttk.Frame(Nb, width=2000, height=2000, style='TFrame')
 Gear(name="Gear1", requirements={"Item1": 100, "Item3": 10}, luck_boost=2, speed_boost=1.1, description="Test Gear") # Create a gear
 Gear(name="Amulet", requirements={"Item2": 10, "Essence": 1}, luck_boost=4, speed_boost=3, description="A simple magical artifact, seems to make you more lucky and slightly faster.")
 Gear(name="Code Fragment", requirements={"Item1": 10000, "Item3": 1000, "Item2": 100, "NullData": 1}, luck_boost=10, speed_boost=5, description="A fragment of useless code")
-Gear(name="Data Reconstructer",requirements={"NullData": 10000, "The First Vessel//DATA = NULL": 10,"The First Vessel//S U P R E M A C Y": 1}, luck_boost=50, speed_boost=15, description="A simple mechanism capable of restoring NullData to it's former state.")
+Late_Gear(name="Black Knife", requirements={"Black Shard": 1000, "S U P R E M A C Y": 1}, luck_boost=1, speed_boost=30, fin_luck_boost=2, description="A strange knife, it feels as if it harms you... yet increases your power in another way...")
+Gear(name="Data Reconstructer",requirements={"NullData": 10000, "The First Vessel//DATA = NULL": 1}, luck_boost=50, speed_boost=15, description="A simple mechanism capable of restoring NullData to it's former state.")
 Late_Gear(name="Timeline Manipulator", requirements={"Kronos": 1}, luck_boost=100, speed_boost=20,fin_luck_boost=2, description="A simple mechanism capable of altering the flow of time.")
 Late_Gear(name="KARMA Manipulator", requirements={"Seraphim": 100, "Apex Predator": 10, "HIM": 1, "The Figure": 1}, luck_boost=1e4, speed_boost=50, fin_luck_boost=10, description="Manipulate the fundemental ideas of good and evil via the manipulation of both sides.")
+Late_Gear(name="Axe of SUPREMACY", requirements={"Black Shard": 1000000, "S U P R E M A C Y": 1000, "The First Vessel//DATA = NULL": 10, "The First Vessel//S U P R E M A C Y": 1}, luck_boost=25000, speed_boost=125, fin_luck_boost=30, description="A weapon of choice, no longer any downsides.")
 Late_Gear(name="Quackularity", requirements={"Duck": 100000, "Apex Predator": 100, "D.U.C.K.": 10, "Goose": 1}, luck_boost=5e4, speed_boost=200, fin_luck_boost=50, description="A singularity created by the condensed power of ducks.")
 Late_Gear(name="Deus Ex Machina", requirements={"HIM": 666, "MAINFRAME": 1e5, "Apex Predator": 1e4, "The Figure": 777, "Wizard10989": 1}, luck_boost=1e6, speed_boost=1e3, fin_luck_boost=100, description="The miracle machine, only limited by the imagination of its user.")
 Late_Gear(name="YOUR Soul", requirements={"YOU": 1000, "YOU//ICARUS": 55}, luck_boost=1e9, speed_boost=1e6, fin_luck_boost = 10000, description="Despite everything... is it YOU..?")
@@ -455,11 +458,6 @@ def god_roll(collection, luck, fin_luck, GUI, current_biome, speed, threshold):
       terminate_2 = threading.Event()
       terminate_2.set()
       time.sleep(10)
-      def colour_switch(text,event, GUI): # Effect
-       while event.is_set():
-         GUI.after(1000, lambda: text.config(insertbackground="black"))
-         GUI.after(1000, lambda: text.config(insertbackground="white"))
-      threading.Thread(target= lambda: colour_switch(text, terminate_2, root), daemon=True).start()
       lines = [
          "Attempting to Access MAINFRAME",
          "Loading...",
@@ -510,7 +508,6 @@ def god_roll(collection, luck, fin_luck, GUI, current_biome, speed, threshold):
            time.sleep(0.05)
          time.sleep(random.uniform(0.3,0.8)) # Random time between 0.3-0.8 seconds
       time.sleep(1)
-      terminate_2.set()
       text.destroy() # Part 2
       finale = [
          "So here we are huh...",
