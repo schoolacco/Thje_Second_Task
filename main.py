@@ -170,6 +170,8 @@ Item("Duck", (("Duck Pond", 2),("R34L1TY", 2)), "Quack", "1/2 Duck Pond Exclusiv
 Item("D.U.C.K.", (("Duck Pond", 1e8), ("MAINFRAME", 5e7), ("MAINFRAME", 5e6)), "Some kind of anti-cheat system that was meant to prevent failure... somehow was taught to only cause failure instead.", "I/100,000,000 Duck Pond Exclusive")
 Item("Item3", 10, "Desc", "1/10")
 Item("Item2", 100, "Desc", "1/100")
+Item("Human", 1000, "Clearly the lesser race.", "1/1000")
+Item("Essence", 5000, "Some kind of unknown substance with potentially magical properties.", "1/5000")
 Item("Seraphim", (("Paradiso", 1e6), ("MAINFRAME", 5e5), ("MAINFRAME//FALLEN", 1e3)), 'The true form of an "angel", near godly power.', "1/1,000,000 Paradiso Exclusive")
 Item("NullData", (("MAINFRAME", 100), ("MAINFRAME//FALLEN", 10)), "The rendition of empty data, or data with the value of 'None', it lacks any properties and tends to corrupt that which interacts with it, it is believed to contain some level of information relating to it's former data.", "1/100, MAINFRAME exclusive")
 Item("MAINFRAME", (("MAINFRAME", 5e8), ("MAINFRAME//FALLEN", 1e6)), "A mere fraction of the power of the true structure. Enough to defeat most Gods.", "1/1,000,000,000", base_chance = 1e9)
@@ -205,6 +207,8 @@ List = Listbox(collection_frame, listvariable=collection, selectmode=SINGLE) # I
 List.pack()
 def Refresh():
   '''Updates the listbox, doesn't destroy it this time, how nice, also really confusing list syntax that I stole online and somehow managed to understand and edit'''
+  global collection
+  collection = dict(zip(sorted(list(collection.keys()), key=lambda e: Item.find(e).get_chance(current_biome, Item.find(e).base)), list(collection.values())))
   listvar = Variable(value=[f"{k}: {v}" for k,v in collection.items()]) #Create a list with the display of: item name: amount, use variable to turn it into something the Listbox is compatible with.
   List.configure(listvariable=listvar) # A bit nicer then destroying it right?
   List.configure(yscrollcommand= scrollbar.set)
@@ -234,8 +238,9 @@ Nb.add(biome_frame, text="Biome Info")
 '''----------Crafting----------'''
 gear_frame = ttk.Frame(Nb, width=2000, height=2000, style='TFrame')
 Gear(name="Gear1", requirements={"Item1": 100, "Item3": 10}, luck_boost=2, speed_boost=1.1, description="Test Gear") # Create a gear
-Gear(name="Code Fragment", requirements={"Item1": 10000, "Item3": 1000, "Item2": 100, "NullData": 1}, luck_boost=5, speed_boost=3, description="A fragment of useless code")
-Gear(name="Data Reconstructer",requirements={"NullData": 10000, "The First Vessel//DATA = NULL": 10,"The First Vessel//S U P R E M A C Y": 1}, luck_boost=10, speed_boost=5, description="A simple mechanism capable of restoring NullData to it's former state.")
+Gear(name="Amulet", requirements={"Item2": 10, "Essence": 1}, luck_boost=4, speed_boost=3, description="A simple magical artifact, seems to make you more lucky and slightly faster.")
+Gear(name="Code Fragment", requirements={"Item1": 10000, "Item3": 1000, "Item2": 100, "NullData": 1}, luck_boost=10, speed_boost=5, description="A fragment of useless code")
+Gear(name="Data Reconstructer",requirements={"NullData": 10000, "The First Vessel//DATA = NULL": 10,"The First Vessel//S U P R E M A C Y": 1}, luck_boost=50, speed_boost=15, description="A simple mechanism capable of restoring NullData to it's former state.")
 Late_Gear(name="Timeline Manipulator", requirements={"Kronos": 1}, luck_boost=100, speed_boost=20,fin_luck_boost=2, description="A simple mechanism capable of altering the flow of time.")
 Late_Gear(name="KARMA Manipulator", requirements={"Seraphim": 100, "Apex Predator": 10, "HIM": 1, "The Figure": 1}, luck_boost=1e4, speed_boost=50, fin_luck_boost=10, description="Manipulate the fundemental ideas of good and evil via the manipulation of both sides.")
 Late_Gear(name="Quackularity", requirements={"Duck": 100000, "Apex Predator": 100, "D.U.C.K.": 10, "Goose": 1}, luck_boost=5e4, speed_boost=200, fin_luck_boost=50, description="A singularity created by the condensed power of ducks.")
