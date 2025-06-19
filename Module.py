@@ -111,6 +111,8 @@ class Gamble:
         result = Gamble.insert(collection, luck, item.get_chance(current_biome, item.base), item.name, GUI, threshold, item.req, item.roll)
         if result == "Success":
             return  "Success" # Stop rolling on success
+    if result == "Failure":
+       collection["Item1"] = collection.get("Item1", 0) + 1
    @staticmethod
    def insert(collection, luck, chance, name, GUI, threshold, requirement, god_roll):
       '''Just simplification to avoid clutter, simply adds to the collection, now also runs the cutscene'''
@@ -127,15 +129,17 @@ class Gamble:
              GUI.after(0,lambda: Cutscene.Cutscene_2(colours=['#000000', '#ffffff'], text="...",GUI=GUI, wav="Why.wav"))
           elif name == "YOU//ICARUS" and chance > threshold:
              GUI.after(0,lambda: Cutscene.Cutscene_2(colours=['#000000', '#ffffff'], text="Where is that peak..?", GUI=GUI, wav="Why.wav"))
+          elif name == "D.U.C.K." and chance > threshold:
+             GUI.after(0, lambda: Cutscene.Cutscene_2(colours=["Yellow", "Black"], text="Thank you for your solutions, they shall be added to the DUCKABASE.",GUI=GUI, wav="Why.wav"))
           collection[name] = collection.get(name, 0) + 1
+          return "Success"
       else:
-          collection["Item1"] = collection.get("Item1", 0) + 1
-          return
+         return "Failure"
    @staticmethod
    def biome_change():
       '''Changes the biome'''
       biomes = [
-          (500, "MAINFRAME"), (100, "Paradiso"), (100, "HIS Domain"), (5000, "MAINFRAME//FALLEN"), (10, "Shardscapes"), (100, "Precipice of Eternity"), (1000000, "R34L1TY")
+          (500, "MAINFRAME"), (100, "Paradiso"), (100, "HIS Domain"), (5000, "MAINFRAME//FALLEN"), (10, "Shardscapes"), (150, "Precipice of Eternity"), (250, "Duck Pond"), (1000000, "R34L1TY")
       ]
       biomes.sort(key= lambda e: e[0])
       for chance, name in biomes:
@@ -178,6 +182,8 @@ class God_Roll:
         GUI.after(0, lambda: Cutscene.Cutscene_2(colours=["#000000","#888888","#FFFFFF"],text="-Bear witness, to the rebirth of a Primordial-"), GUI=GUI, wav="Why.wav")
        elif name == "Kronos" and cutscene:
         GUI.after(0, lambda: Cutscene.Cutscene_2(colours=["#000000", "#11111111","#22222222", "#33333333", "#44444444", "#55555555", "#66666666", "#77777777", "#88888888"], text="I would spare your life, but it would be a waste.", GUI=GUI, wav="Why.wav"))
+       elif name == "Goose" and cutscene:
+        GUI.after(0,lambda: Cutscene.Cutscene_2(colours=["White", "Black"], text="Honk", GUI=GUI, wav="Why.wav"))
        elif name == "Wizard10989//???":
           collection[name] = collection.get(name, 0) + 1
           return "Special"
