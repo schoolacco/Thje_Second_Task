@@ -219,6 +219,8 @@ The project currently meets almost all functional and non-functional requirement
 
 All of these will be easy to make, other than maybe the final cutscene, due to the pre-existing systems I have made adding and changing items/gears will be incredibly easy, and adding more cutscenes is just as easy, the auto roll has already been made, the only real things that require change are the administrator god rolls (which will be a minor edit to the pre-existing auto roll code), and the final cutscene, which will be simple to integrate, but difficult to actually make.
 
+![New Structure Chart](structure_new.png)
+
 ## Build and Test
 main
 ```Python
