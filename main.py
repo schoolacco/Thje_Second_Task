@@ -333,6 +333,8 @@ def Luck():
    global luck
    try:
       luck = float(Luck_entry.get())
+      if luck == math.inf:
+         luck = 1
    except ValueError:
       pass
 def Fin_Luck():
@@ -340,6 +342,8 @@ def Fin_Luck():
    global fin_luck
    try:
       fin_luck = float(FinLuck_entry.get())
+      if fin_luck == math.inf:
+        fin_luck = 1
    except ValueError:
       pass
 def Set_God_Roll():
@@ -363,9 +367,11 @@ def Set_Speed():
    global speed
    try:
       speed = (1/float(speed_entry.get()))
+      if speed == math.inf:
+         speed = 1
 
    except ValueError:
-      speed = 0
+      speed = 1
       pass
 Button(admin_frame, text="Set Luck", bg="black", fg="white", command=lambda:Luck()).pack() # Set the luck
 Label(admin_frame, text="Final Luck", bg="black", fg="white").pack()
